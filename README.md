@@ -43,27 +43,27 @@ examples/                     # 실측 캘리브레이션 3컷 — 컴파일 프
 
 ## 설치
 
-`<repo-url>`을 이 저장소 주소로 바꿔 자기 에이전트 한 줄만 실행한다. 스킬은 클론 즉시 동작한다(외부 패키지 0 — python3·node 표준만 사용).
+아래 URL로 자기 에이전트 한 줄만 실행한다. 스킬은 클론 즉시 동작한다(외부 패키지 0 — python3·node 표준만 사용).
 
 ```sh
 # Claude Code
-git clone <repo-url> ~/.claude/skills/master-prompt-writer
+git clone https://github.com/eusine/master-prompt-writer.git ~/.claude/skills/master-prompt-writer
 
 # Codex CLI
-git clone <repo-url> ~/.codex/skills/master-prompt-writer
+git clone https://github.com/eusine/master-prompt-writer.git ~/.codex/skills/master-prompt-writer
 
 # GJC (gajae-code) — 유저 레벨
-git clone <repo-url> ~/.gjc/agent/skills/master-prompt-writer
+git clone https://github.com/eusine/master-prompt-writer.git ~/.gjc/agent/skills/master-prompt-writer
 # GJC — 특정 프로젝트에만
-git clone <repo-url> <project>/.gjc/skills/master-prompt-writer
+git clone https://github.com/eusine/master-prompt-writer.git <project>/.gjc/skills/master-prompt-writer
 
 # Hermes
-hermes skills install <repo-url> --category prompt-writing
+hermes skills install https://github.com/eusine/master-prompt-writer.git --category prompt-writing
 # 또는 직접 클론
-git clone <repo-url> ~/.hermes/skills/prompt-writing/master-prompt-writer
+git clone https://github.com/eusine/master-prompt-writer.git ~/.hermes/skills/prompt-writing/master-prompt-writer
 
 # 공용 스킬 디렉토리 컨벤션(~/.agents/skills)을 읽는 에이전트
-git clone <repo-url> ~/.agents/skills/master-prompt-writer
+git clone https://github.com/eusine/master-prompt-writer.git ~/.agents/skills/master-prompt-writer
 ```
 
 설치 확인: 에이전트에게 "프롬프트 만들어줘"라고 하면 이 스킬이 발동해야 한다. 이미지 레인은 "카페 포스터 프롬프트 만들어줘" 같은 이미지 프롬프트 요청으로 확인한다.
