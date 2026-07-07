@@ -7,8 +7,8 @@ metadata:
   category: prompt-writing
   locale: ko-KR
   doctrine: unified-delegation-contract
-  updated_at: 2026-07-08
-  model_claims_reviewed_at: 2026-07-07
+  updated_at: "2026-07-08"
+  model_claims_reviewed_at: "2026-07-07"
 ---
 
 # Master Prompt Writer — 디스패치 커널
