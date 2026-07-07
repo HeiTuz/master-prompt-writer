@@ -1,0 +1,13 @@
+name: lint
+on: [push, pull_request]
+jobs:
+  self-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: skill self-lint
+        run: python3 scripts/lint.py
+      - name: image prompt validator self-test
+        run: node scripts/check_prompt.mjs --test
