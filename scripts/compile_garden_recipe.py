@@ -121,9 +121,8 @@ def compile_recipe(recipe: dict[str, Any]) -> dict[str, Any]:
     locks = recipe["locks"]
     exclusions = list(recipe["exclusions"])
     qc = [
-        *(f"Identity lock holds: {value}" for value in locks["identity"]),
-        *(f"Subject lock holds: {value}" for value in locks["subject"]),
-        *(f"Excluded condition is absent: {value}" for value in exclusions),
+        "Every immutable identity and subject lock matches the GardenRecipe exactly.",
+        "Every negative constraint is absent from the generated result.",
         "The attached reference is used only for the stated evidence-backed visual guidance.",
         "Every prompt block is self-contained and at most 2000 Unicode characters.",
     ]

@@ -14,6 +14,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACT_ROOT = Path(os.environ.get("MASTER_PROMPT_CONTRACT_ROOT", ROOT / "contracts"))
 FIXTURE = CONTRACT_ROOT / "v1" / "fixtures" / "garden-recipe.image.valid.json"
+DESIGN_FIXTURE = CONTRACT_ROOT / "v1" / "fixtures" / "garden-recipe.design.valid.json"
 
 
 def load_module(path: Path, name: str):
@@ -25,10 +26,11 @@ def load_module(path: Path, name: str):
     return module
 
 
-@unittest.skipUnless(FIXTURE.is_file(), "authoritative contracts must be present or MASTER_PROMPT_CONTRACT_ROOT set")
 class CompileGardenRecipeTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
+        if not FIXTURE.is_file() or not DESIGN_FIXTURE.is_file():
+            raise RuntimeError("authoritative contracts missing; sync contracts/ or set MASTER_PROMPT_CONTRACT_ROOT")
         cls.compiler = load_module(ROOT / "scripts" / "compile_garden_recipe.py", "recipe_compiler")
         cls.contracts = load_module(CONTRACT_ROOT / "validate.py", "contract_validator")
         cls.recipe = json.loads(FIXTURE.read_text(encoding="utf-8"))
@@ -42,6 +44,14 @@ class CompileGardenRecipeTests(unittest.TestCase):
         self.assertTrue(handoff["variable_axes"])
         self.assertTrue(handoff["reference_requirements"])
         self.assertTrue(handoff["qc_acceptance_criteria"])
+
+    def test_design_recipe_routes_from_intended_use(self) -> None:
+        recipe = json.loads(DESIGN_FIXTURE.read_text(encoding="utf-8"))
+        bundle = self.compiler.compile_recipe(recipe)
+        self.assertEqual([], self.contracts.validate_document(bundle, recipe))
+        self.assertEqual("DESIGN", bundle["handoff"]["mode"])
+        self.assertEqual("frontend-agent", bundle["handoff"]["engine"])
+        self.assertEqual("non_locked_responsive_detail", bundle["handoff"]["variable_axes"][0]["name"])
 
     def test_unicode_count_uses_code_points_and_stays_within_limit(self) -> None:
         recipe = copy.deepcopy(self.recipe)
