@@ -65,9 +65,17 @@ function isEmptyDir(p) {
   return fs.existsSync(p) && fs.statSync(p).isDirectory() && fs.readdirSync(p).length === 0;
 }
 
+const ALLOWED_INSTALL_ROOTS = new Set([
+  "AGENTS.md", "LICENSE", "README.md", "SKILL.md", "package.json",
+  "contracts", "examples", "references", "scripts",
+]);
+
 function shouldSkip(rel) {
   const parts = rel.split(path.sep);
-  return parts.some((p) => [".git", "node_modules", ".gjc"].includes(p)) ||
+  if (!ALLOWED_INSTALL_ROOTS.has(parts[0])) return true;
+  return parts.some((p) => [".git", "node_modules", ".gjc", ".omx", "__pycache__", "docs-internal"].includes(p)) ||
+    path.basename(rel) === ".DS_Store" ||
+    rel.endsWith(".pyc") ||
     rel === "package-lock.json" ||
     rel === "bun.lockb" ||
     rel === "bun.lock";
