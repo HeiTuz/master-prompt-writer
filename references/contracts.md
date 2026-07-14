@@ -2,23 +2,23 @@
 
 ## 정본과 배포
 
-`contracts/`는 이 인터페이스의 유일한 편집 정본이다. `image-reference-gardener`와 `design-reference-gardener`는 독립 설치를 위해 동일한 상대 경로 `contracts/`에 바이트 동일 미러를 포함할 수 있지만, 미러에서 계약을 편집하지 않는다. `contracts/manifest.json`의 SHA-256 목록이 릴리스 provenance다.
+`contracts/`는 이 인터페이스의 유일한 편집 정본이다. `image-reference-adapter`와 `design-reference-adapter`는 독립 설치를 위해 동일한 상대 경로 `contracts/`에 바이트 동일 미러를 포함할 수 있지만, 미러에서 계약을 편집하지 않는다. `contracts/manifest.json`의 SHA-256 목록이 릴리스 provenance다.
 
 소스 레포가 편집 권한을 가진다. `~/.hermes/skills/...` 같은 설치본은 배포 산출물이며 직접 수정하지 않는다. 설치본 전용 변경이 발견되면 먼저 해당 소스 레포로 분리·검토한 뒤 배포한다. 계약 갱신 순서는 다음과 같다.
 
 1. `HeiTuzMPW/contracts/`에서 스키마·검증기·fixture를 함께 변경한다.
 2. manifest SHA-256을 갱신하고 `python3 scripts/test_contracts.py`를 통과한다.
-3. `python3 scripts/sync_contracts.py --sync --dest <gardener-source>`로 각 독립 소스에 미러한다.
+3. `python3 scripts/sync_contracts.py --sync --dest <adapter-source>`로 각 독립 소스에 미러한다.
 4. 각 스킬의 기존 설치 절차로 소스 전체를 설치본에 배포한다. 정본에서 설치본으로 역복사하지 않는다.
-5. 정본 레포에서 `python3 scripts/sync_contracts.py --dest <gardener-source> --dest <installed-skill>`로 drift가 없음을 확인한다.
+5. 정본 레포에서 `python3 scripts/sync_contracts.py --dest <adapter-source> --dest <installed-skill>`로 drift가 없음을 확인한다.
 
-스키마 major가 다른 payload는 자동 승격하지 않는다. 기존 analysis JSON을 GardenRecipe로 바꾸는 adapter는 각 gardener 소관이고, 컴파일·PromptBundle 생성은 Master 소관이다. 이 문서는 분석 필드나 컴파일 규칙을 복제하지 않는다.
+스키마 major가 다른 payload는 자동 승격하지 않는다. 기존 analysis JSON을 GardenRecipe로 바꾸는 adapter는 각 adapter 소관이고, 컴파일·PromptBundle 생성은 Master 소관이다. 이 문서는 분석 필드나 컴파일 규칙을 복제하지 않는다.
 
 ## 인터페이스 표
 
 | 경계 | 생산자 → 소비자 | 필수 불변식 | 실패 방식 |
 |---|---|---|---|
-| `GardenRecipe v1` | image/design gardener → Master | opaque `ref_*` ID + `sha256:*`만, observation/inference 분리, 근거 confidence, qualified token, identity/subject lock, camera/light/palette evidence, exclusions, intended use | 검증 오류와 함께 컴파일 거부 |
+| `GardenRecipe v1` | image/design adapter → Master | opaque `ref_*` ID + `sha256:*`만, observation/inference 분리, 근거 confidence, qualified token, identity/subject lock, camera/light/palette evidence, exclusions, intended use | 검증 오류와 함께 컴파일 거부 |
 | `PromptBundle v1` | Master → executor/bridge | validated recipe hash, 단일 `handoff`, 블록별 Unicode code point ≤2,000, lock 보존, variable axes, negatives, reference requirements, QC | handoff 거부; 자동 완화 금지 |
 | `ApparelHandoff v1` | apparel compiler → image producer | 제품 role map·불변 lock·전체 인벤토리·자기완결 프롬프트 | 입력/lock 누락 시 거부 |
 | `ImgGen2ProductionRecord v1` | image producer → QC/recompile | 소스 증거 인덱스·생성 결과·검증 상태 | provenance 또는 결과 불일치 시 거부 |
@@ -42,7 +42,7 @@
 
 정본 스키마: `contracts/v1/prompt-bundle.schema.json`.
 
-`PromptBundle`의 실행 표면은 `handoff` 하나다. Higgsfield를 포함한 실행 adapter는 다른 Master 내부 상태나 gardener 저장소를 읽지 않고 이 객체만 소비한다. 엔진 선택은 `handoff.engine` 값이며, 엔진별 비공개 옵션을 새 key로 추가하지 않는다.
+`PromptBundle`의 실행 표면은 `handoff` 하나다. Higgsfield를 포함한 실행 adapter는 다른 Master 내부 상태나 adapter 저장소를 읽지 않고 이 객체만 소비한다. 엔진 선택은 `handoff.engine` 값이며, 엔진별 비공개 옵션을 새 key로 추가하지 않는다.
 
 각 `prompt_blocks[].unicode_char_count`는 JSON 문자열의 Unicode code point 수와 정확히 같아야 하고 2,000 이하여야 한다. 블록은 파일 경로나 외부 파일 읽기 지시 없이 자기완결이어야 한다. `--recipe` 교차 검증은 다음을 함께 증명한다.
 

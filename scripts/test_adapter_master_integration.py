@@ -25,8 +25,8 @@ def skill_root(env_name: str, skill_name: str) -> Path:
     return next((path for path in candidates if path.is_dir()), candidates[0])
 
 
-IMAGE_ROOT = skill_root("IMAGE_REFERENCE_GARDENER_ROOT", "image-reference-gardener")
-DESIGN_ROOT = skill_root("DESIGN_REFERENCE_GARDENER_ROOT", "design-reference-gardener")
+IMAGE_ROOT = skill_root("IMAGE_REFERENCE_ADAPTER_ROOT", "image-reference-adapter")
+DESIGN_ROOT = skill_root("DESIGN_REFERENCE_ADAPTER_ROOT", "design-reference-adapter")
 BRIDGE_ROOT = skill_root("HIGGSFIELD_BRIDGE_ROOT", "higgsfield-prompt-bridge")
 CONTRACT_ROOT = Path(os.environ.get("MASTER_PROMPT_CONTRACT_ROOT", MASTER_ROOT / "contracts"))
 COMPILER_ROOT = Path(os.environ.get("MASTER_PROMPT_COMPILER_ROOT", MASTER_ROOT))
@@ -41,7 +41,7 @@ def load_module(name: str, path: Path) -> Any:
     return module
 
 
-class GardenerMasterIntegrationTests(unittest.TestCase):
+class AdapterMasterIntegrationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         required = [
@@ -49,8 +49,8 @@ class GardenerMasterIntegrationTests(unittest.TestCase):
             CONTRACT_ROOT / "v1/fixtures/garden-recipe.image.valid.json",
             CONTRACT_ROOT / "v1/fixtures/garden-recipe.design.valid.json",
             COMPILER_ROOT / "scripts/compile_garden_recipe.py",
-            IMAGE_ROOT / "scripts/gardener_loop.py",
-            DESIGN_ROOT / "scripts/gardener_loop.py",
+            IMAGE_ROOT / "scripts/adapter_loop.py",
+            DESIGN_ROOT / "scripts/adapter_loop.py",
             BRIDGE_ROOT / "scripts/higgsfield_job.py",
         ]
         missing = [str(path) for path in required if not path.is_file()]
@@ -59,13 +59,13 @@ class GardenerMasterIntegrationTests(unittest.TestCase):
         os.environ["MASTER_PROMPT_CONTRACT_ROOT"] = str(CONTRACT_ROOT)
         cls.contracts = load_module("integration_contracts", CONTRACT_ROOT / "validate.py")
         cls.compiler = load_module("integration_compiler", COMPILER_ROOT / "scripts/compile_garden_recipe.py")
-        cls.image_loop = load_module("integration_image_loop", IMAGE_ROOT / "scripts/gardener_loop.py")
-        cls.design_loop = load_module("integration_design_loop", DESIGN_ROOT / "scripts/gardener_loop.py")
+        cls.image_loop = load_module("integration_image_loop", IMAGE_ROOT / "scripts/adapter_loop.py")
+        cls.design_loop = load_module("integration_design_loop", DESIGN_ROOT / "scripts/adapter_loop.py")
         cls.bridge = load_module("integration_higgsfield_bridge", BRIDGE_ROOT / "scripts/higgsfield_job.py")
         cls.image_recipe = json.loads((CONTRACT_ROOT / "v1/fixtures/garden-recipe.image.valid.json").read_text(encoding="utf-8"))
         cls.design_recipe = json.loads((CONTRACT_ROOT / "v1/fixtures/garden-recipe.design.valid.json").read_text(encoding="utf-8"))
 
-    def test_canonical_recipes_cross_gardener_validation_boundary(self) -> None:
+    def test_canonical_recipes_cross_adapter_validation_boundary(self) -> None:
         self.assertEqual([], self.image_loop.recipe_contract_errors(
             self.image_recipe,
             reference_id=self.image_recipe["source"]["reference_id"],

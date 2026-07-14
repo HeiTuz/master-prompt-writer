@@ -4,7 +4,7 @@
 
 ## 입력 게이트
 
-`scripts/compile_garden_recipe.py`는 `contracts/validate.py`가 오류 0개로 판정한 `garden-recipe/v1` JSON만 받는다. 원시 분석 JSON, 과거 자유형 레시피, schema version 없는 객체는 컴파일하지 않는다. 호출자가 먼저 gardener 출력물을 GardenRecipe로 승격·검증해야 한다. 계약 파일이 설치되지 않았으면 추측성 fallback 대신 `contract_validator_missing`으로 실패한다.
+`scripts/compile_garden_recipe.py`는 `contracts/validate.py`가 오류 0개로 판정한 `garden-recipe/v1` JSON만 받는다. 원시 분석 JSON, 과거 자유형 레시피, schema version 없는 객체는 컴파일하지 않는다. 호출자가 먼저 adapter 출력물을 GardenRecipe로 승격·검증해야 한다. 계약 파일이 설치되지 않았으면 추측성 fallback 대신 `contract_validator_missing`으로 실패한다.
 
 ```sh
 python3 scripts/compile_garden_recipe.py recipe.json --output prompt-bundle.json

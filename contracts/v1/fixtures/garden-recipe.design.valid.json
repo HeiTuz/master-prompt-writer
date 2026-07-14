@@ -7,7 +7,7 @@
     "reference_hash": "sha256:3333333333333333333333333333333333333333333333333333333333333333"
   },
   "provenance": {
-    "producer": "design-reference-gardener",
+    "producer": "design-reference-adapter",
     "producer_version": "1.0.1",
     "analysis_schema_version": "design-reference-analysis/v1",
     "analysis_hash": "sha256:4444444444444444444444444444444444444444444444444444444444444444"

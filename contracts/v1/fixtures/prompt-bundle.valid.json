@@ -4,7 +4,7 @@
   "bundle_id": "pb_editorial_20260711",
   "source_recipe": {
     "recipe_id": "gr_editorial_20260711",
-    "recipe_hash": "sha256:5a13c80c733d69aeac0028936412684af9ef181fb73e2649c24fd7f60786b72a"
+    "recipe_hash": "sha256:6e3deb25fa97604112f04243114dc661f36974acb70cfe135ccad64dff4d4a58"
   },
   "handoff": {
     "protocol": "generation-handoff/v1",
@@ -18,16 +18,28 @@
       }
     ],
     "immutable_locks": {
-      "identity": ["preserve the same fictional adult identity across all blocks"],
-      "subject": ["one adult subject", "upright three-quarter pose"]
+      "identity": [
+        "preserve the same fictional adult identity across all blocks"
+      ],
+      "subject": [
+        "one adult subject",
+        "upright three-quarter pose"
+      ]
     },
     "variable_axes": [
       {
         "name": "crop",
-        "allowed_values": ["medium portrait", "waist-up portrait"]
+        "allowed_values": [
+          "medium portrait",
+          "waist-up portrait"
+        ]
       }
     ],
-    "negative_constraints": ["extra people", "invented logos", "identity drift"],
+    "negative_constraints": [
+      "extra people",
+      "invented logos",
+      "identity drift"
+    ],
     "reference_requirements": [
       {
         "reference_id": "ref_7f2a91c4d6e8",
