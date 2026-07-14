@@ -28,6 +28,9 @@ try {
   const installDest = path.join(temp, "installed");
   run(process.execPath, ["scripts/install.mjs", "--dest", installDest, "--force", "--quiet"]);
   assert.equal(hasExcludedPath(installDest), false, "installer copied excluded local state");
+  const forwardedDest = path.join(temp, "forwarded");
+  run(process.execPath, ["scripts/install.mjs", "--", "--dest", forwardedDest, "--force", "--quiet"]);
+  assert.equal(fs.existsSync(path.join(forwardedDest, "SKILL.md")), true, "forwarded -- arguments did not install");
 
   const packed = JSON.parse(run("npm", ["pack", "--dry-run", "--json"]));
   const names = packed[0].files.map((file) => file.path);

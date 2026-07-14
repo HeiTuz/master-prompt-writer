@@ -75,27 +75,38 @@ GJC에서 검증된 방식 중 다른 런타임에서도 그대로 통하는 것
 - 한글 타이포와 카드뉴스 구조
 - 배경 합성용 프레임·정체성 고정 계약
 - JSONL 양산 규칙과 zero-dependency 검증기
+- 범용 이미지 제작 요청을 실행기와 연결하는 `heituz-image-production-handoff/v1`
 - Vision role map 기반 의류 폴더 핸드오프 컴파일러와 휴대 가능한 스키마
 - 이미지·영상 레인별 실패 조건과 검수 기준
+
+## 이미지 제작 핸드오프
+
+MPW는 프롬프트를 컴파일하고 이미지 실행기는 생성·편집을 수행합니다. `scripts/compile_image_handoff.py`는 이 경계를 호스트에 종속되지 않는 `heituz-image-production-handoff/v1` JSON으로 내보냅니다.
+
+```sh
+python3 scripts/compile_image_handoff.py request.json --output handoff.json
+```
+
+입력 이미지는 번들과 함께 이동하는 상대 경로 또는 공개 HTTPS URL만 사용합니다. 출력은 PNG/JPEG/WebP 파일명으로 지정합니다. [공개 계약과 예제](references/image/image-production-handoff.md)는 HeiTuzImgGen2가 설치되어 있으면 그대로 전달할 수 있고, 다른 스키마 호환 실행기에서도 사용할 수 있습니다. 실행기 없이 MPW만 설치해 기존처럼 자기완결 프롬프트를 쓰는 흐름도 유지됩니다.
 
 ## 30초 설치
 
 기본값은 Hermes 설치입니다.
 
 ```sh
-npx --yes github:HeiTuz/HeiTuzMPW
+npx --yes github:HeiTuz/HeiTuzMPW#v2.8.0
 # 또는
-bunx github:HeiTuz/HeiTuzMPW
+bunx github:HeiTuz/HeiTuzMPW#v2.8.0
 ```
 
 다른 에이전트에 설치하려면 대상만 지정하세요.
 
 ```sh
-npx --yes github:HeiTuz/HeiTuzMPW --target codex
-npx --yes github:HeiTuz/HeiTuzMPW --target gpt
-npx --yes github:HeiTuz/HeiTuzMPW --target claude
-npx --yes github:HeiTuz/HeiTuzMPW --target gjc
-npx --yes github:HeiTuz/HeiTuzMPW --target agents
+npx --yes github:HeiTuz/HeiTuzMPW#v2.8.0 -- --target codex
+bunx github:HeiTuz/HeiTuzMPW#v2.8.0 -- --target gpt
+npx --yes github:HeiTuz/HeiTuzMPW#v2.8.0 -- --target claude
+npx --yes github:HeiTuz/HeiTuzMPW#v2.8.0 -- --target gjc
+npx --yes github:HeiTuz/HeiTuzMPW#v2.8.0 -- --target agents
 ```
 
 직접 설치하는 방법도 있습니다.
@@ -140,6 +151,7 @@ npm run smoke:runtime
 - 프롬프트 예시의 실제 글자 수 확인
 - 블록당 2,000자 초과 차단
 - 이미지 프롬프트 good/bad fixture 16종 회귀 테스트
+- 범용 이미지 핸드오프의 생성·편집 분기, 휴대 경로, 스키마 fixture 테스트
 - 의류 색상 정규화·전체 인벤토리·2,000자 실패-폐쇄 컴파일 테스트
 - 설치기 스모크 테스트
 - GitHub Actions에서도 같은 항목 검증
@@ -153,7 +165,8 @@ references/templates.md        모드별 골격과 출력 게이트
 references/model-playbooks.md  역할·권한 라우팅과 capability 플레이북
 references/image/              이미지 정밀 컴파일 계층
 references/adapters.md         런타임별 설치·호출 어댑터
-contracts/v1/                  휴대 가능한 의류 핸드오프 스키마·fixture
+contracts/v1/                  휴대 가능한 이미지 핸드오프 스키마·fixture
+scripts/compile_image_handoff.py  범용 이미지 제작 핸드오프 컴파일러
 scripts/compile_apparel_handoff.py  의류 폴더 핸드오프 컴파일러
 scripts/lint.py                스킬 자기 린트
 scripts/check_prompt.mjs       이미지 프롬프트 검증기

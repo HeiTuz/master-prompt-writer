@@ -1,5 +1,7 @@
 name: lint
 on: [push, pull_request]
+permissions:
+  contents: read
 jobs:
   self-lint:
     runs-on: ubuntu-latest
@@ -7,6 +9,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: '22' }
+      - uses: oven-sh/setup-bun@v2
       - name: skill self-lint
         run: python3 scripts/lint.py
       - name: full network-free test suite
@@ -15,3 +18,17 @@ jobs:
         run: npm run smoke:install
       - name: shared-core runtime adapter smoke
         run: npm run smoke:runtime
+      - name: exact-tree npx and bunx forwarded-argument smoke
+        shell: bash
+        run: |
+          pack_dir="$(mktemp -d)"
+          tarball="$(npm pack --pack-destination "$pack_dir" --silent)"
+          package="$pack_dir/$tarball"
+          npx_home="$(mktemp -d)"
+          HOME="$npx_home" npx --yes --package "$package" heituzmpw -- --target agents --force --quiet
+          test -f "$npx_home/.agents/skills/HeiTuzMPW/SKILL.md"
+          test -f "$npx_home/.agents/skills/HeiTuzMPW/contracts/v1/image-production-handoff.schema.json"
+          bunx_home="$(mktemp -d)"
+          HOME="$bunx_home" bunx --package "$package" heituzmpw -- --target agents --force --quiet
+          test -f "$bunx_home/.agents/skills/HeiTuzMPW/SKILL.md"
+          test -f "$bunx_home/.agents/skills/HeiTuzMPW/contracts/v1/image-production-handoff.schema.json"

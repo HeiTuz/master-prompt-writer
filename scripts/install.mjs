@@ -43,6 +43,7 @@ function parseArgs(argv) {
   for (let i = 0; i < argv.length; i += 1) {
     const a = argv[i];
     if (a === "-h" || a === "--help") usage(0);
+    if (a === "--") continue;
     if (a === "--force") { opts.force = true; continue; }
     if (a === "--quiet") { opts.quiet = true; continue; }
     if (a === "--target") { opts.target = argv[++i]; continue; }
