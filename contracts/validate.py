@@ -14,6 +14,10 @@ CONTRACT_ROOT = Path(__file__).resolve().parent
 SCHEMA_FILES = {
     "garden-recipe/v1": CONTRACT_ROOT / "v1" / "garden-recipe.schema.json",
     "prompt-bundle/v1": CONTRACT_ROOT / "v1" / "prompt-bundle.schema.json",
+    "source-evidence-index/v1": CONTRACT_ROOT / "v1" / "source-evidence-index.schema.json",
+    "production-adapter-options/v1": CONTRACT_ROOT / "v1" / "production-adapter-options.schema.json",
+    "imggen2-production-record/v1": CONTRACT_ROOT / "v1" / "imggen2-production-record.schema.json",
+    "mpw-recompile-request/v1": CONTRACT_ROOT / "v1" / "mpw-recompile-request.schema.json",
 }
 FORBIDDEN_KEYS = {
     "api_key",
@@ -236,6 +240,100 @@ def _bundle_semantic_errors(value: dict[str, Any], recipe: dict[str, Any] | None
     return errors
 
 
+AXIS_DELTA = {
+    "goal_fit": "clarify_goal_fit",
+    "text_accuracy": "resolve_text_from_source",
+    "material_realism": "clarify_material_realism",
+    "layout": "clarify_layout",
+}
+PROMO_CHECKS = [
+    "physical_type_subject_interaction",
+    "generic_card_regression",
+    "printed_meta_ui_not_literal",
+    "color_lock_2_to_3",
+    "finishing_devices_1_to_3",
+    "korean_glyph_mask_safety",
+]
+GEOMETRY = {
+    "1:1": "1024x1024",
+    "3:4": "1024x1536",
+    "4:3": "1536x1024",
+    "9:16": "1024x1536",
+    "16:9": "1536x1024",
+}
+
+
+def _unique_sorted_strings(values: Any, path: str) -> list[str]:
+    if not isinstance(values, list) or not all(isinstance(item, str) for item in values):
+        return []
+    errors: list[str] = []
+    if len(values) != len(set(values)):
+        errors.append(f"{path}: duplicate")
+    if values != sorted(values):
+        errors.append(f"{path}: not_sorted")
+    return errors
+
+
+def _source_index_semantic_errors(value: dict[str, Any]) -> list[str]:
+    references = value.get("references", [])
+    errors = _unique_sorted_strings(
+        [item.get("reference_id") for item in references if isinstance(item, dict)],
+        "$.references.reference_id",
+    )
+    return errors + _privacy_errors(value)
+
+
+def _options_semantic_errors(value: dict[str, Any]) -> list[str]:
+    errors = _privacy_errors(value)
+    output_path = value.get("output_path")
+    if isinstance(output_path, str):
+        parts = output_path.replace("\\", "/").split("/")
+        if output_path.startswith(("/", "~")) or ".." in parts or "." in parts or "\\" in output_path:
+            errors.append("$.output_path: unsafe_relative_path")
+    expected_size = GEOMETRY.get(value.get("ar"))
+    if expected_size is not None and value.get("size") != expected_size:
+        errors.append("$.size: production_geometry_mismatch")
+    applicability = value.get("qc_applicability", {})
+    evidence_ids = applicability.get("evidence_reference_ids", []) if isinstance(applicability, dict) else []
+    errors.extend(_unique_sorted_strings(evidence_ids, "$.qc_applicability.evidence_reference_ids"))
+    if isinstance(applicability, dict) and (
+        applicability.get("promotional") or applicability.get("rendered_text_expected")
+    ) and not evidence_ids:
+        errors.append("$.qc_applicability.evidence_reference_ids: required_when_applicable")
+    return errors
+
+
+def _production_semantic_errors(value: dict[str, Any]) -> list[str]:
+    errors = _privacy_errors(value)
+    errors.extend(_unique_sorted_strings(value.get("reference_ids", []), "$.reference_ids"))
+    expected_size = GEOMETRY.get(value.get("ar"))
+    if expected_size is not None and value.get("size") != expected_size:
+        errors.append("$.size: production_geometry_mismatch")
+    return errors
+
+
+def _recompile_semantic_errors(value: dict[str, Any]) -> list[str]:
+    errors = _privacy_errors(value)
+    axes = value.get("failed_axes", [])
+    checks = value.get("failed_promo_checks", [])
+    if isinstance(axes, list) and isinstance(checks, list) and not axes and not checks:
+        errors.append("$: recompile_failure_fact_required")
+    for path, items in (("$.failed_axes", axes), ("$.failed_promo_checks", checks)):
+        if isinstance(items, list) and len(items) != len(set(item for item in items if isinstance(item, str))):
+            errors.append(f"{path}: duplicate")
+    expected_reasons = [
+        *(f"qc_axis:{axis}" for axis in axes if axis in AXIS_DELTA),
+        *(f"promo_check:{check}" for check in checks if check in PROMO_CHECKS),
+    ]
+    expected_deltas = [
+        *(AXIS_DELTA[axis] for axis in axes if axis in AXIS_DELTA),
+        *(f"resolve_promo_{check}" for check in checks if check in PROMO_CHECKS),
+    ]
+    if value.get("reason_codes") != expected_reasons:
+        errors.append("$.reason_codes: recompile_reason_mapping_mismatch")
+    if value.get("requested_delta_codes") != expected_deltas:
+        errors.append("$.requested_delta_codes: recompile_delta_mapping_mismatch")
+    return errors
 def load_schema(schema_version: str) -> dict[str, Any]:
     path = SCHEMA_FILES.get(schema_version)
     if path is None:
@@ -258,6 +356,14 @@ def validate_document(value: Any, recipe: dict[str, Any] | None = None) -> list[
         errors.extend(_garden_semantic_errors(value))
     elif schema_version == "prompt-bundle/v1":
         errors.extend(_bundle_semantic_errors(value, recipe))
+    elif schema_version == "source-evidence-index/v1":
+        errors.extend(_source_index_semantic_errors(value))
+    elif schema_version == "production-adapter-options/v1":
+        errors.extend(_options_semantic_errors(value))
+    elif schema_version == "imggen2-production-record/v1":
+        errors.extend(_production_semantic_errors(value))
+    elif schema_version == "mpw-recompile-request/v1":
+        errors.extend(_recompile_semantic_errors(value))
     return sorted(set(errors))
 
 

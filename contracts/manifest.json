@@ -1,14 +1,24 @@
 {
   "authority": "HeiTuzMPW/contracts",
-  "contract_release": "2026-07-11.v1",
+  "contract_release": "2026-07-13.v2",
   "files": {
+    "v1/apparel-handoff.schema.json": "b1c418a4c815a4f6ecf7eff409882f215bf821b78300c411614ae920520dcc03",
+    "v1/fixtures/apparel-handoff.valid.json": "07cef301565ffeb0fc1f6e1d15b598a815c6fe9455800e88fc80f09a2ba541e4",
     "v1/fixtures/garden-recipe.design.valid.json": "58decc5d2ae4c80fec8794dcb8ca67c01a8aff6cf9a15dd3ca8632fa39edb762",
     "v1/fixtures/garden-recipe.image.valid.json": "935c2eca67dc10b07b5e69535d58ab13c2e2e456023943b8910811b08f517329",
     "v1/fixtures/garden-recipe.private.invalid.json": "2b32e2428d21efc9edb219f0f1a943f61b0fd2c987d49aef3db1ea7fd844c7e7",
+    "v1/fixtures/imggen2-production-record.valid.json": "714b58ccb07da0237e1c045fee05ac2d713199a8502eb41a0ffb9c2a483ca77d",
+    "v1/fixtures/mpw-recompile-request.valid.json": "8d52e8a280a7019a8aec5c08459f866c21121ae2c5312994848ae8e1db9fe825",
+    "v1/fixtures/production-adapter-options.valid.json": "3a843f504af14ae1b8dc796324cec956b0a8fa038fe3eafbca1e5d00908e1369",
     "v1/fixtures/prompt-bundle.valid.json": "1cd37377e2cc33f828997953f17258ea53938c8af883e590d89cd11c22151f65",
-    "v1/garden-recipe.schema.json": "67b88c0b45f50954b0d9fbb176a36d853cd5239e50fa4af9bbb3f702f936e6b9",
+    "v1/fixtures/source-evidence-index.valid.json": "5614010b7d0aa795c96b91ff26a48df0dcce6d7cc6a3aa3692bcdc314d30792b",
+    "v1/garden-recipe.schema.json": "184bea1fb7f89af316f91b2cb630a57cc72d89ca13c608c36d3c083d2337732c",
+    "v1/imggen2-production-record.schema.json": "8925babb1fbddfbe4603fc2db59e56907128a31e8170080802b55ea5430aff01",
+    "v1/mpw-recompile-request.schema.json": "b8fc50ce666a42b54d9373fba80cdb76bba8bfaebe7ba71c000d27e356d12c37",
+    "v1/production-adapter-options.schema.json": "540c3b4019f0f39479792fed69ebc6ce21c28cdec33774a986babf06267636bb",
     "v1/prompt-bundle.schema.json": "5fd84d4755c5e8dbf75dbbc4b2759c52f3e5cc4bc0143d18fcd0c6355ce7df99",
-    "validate.py": "ea3f318ab9075f338abc272923a7cabe6d57c2291dc28b76e1df2688c3657e8d"
+    "v1/source-evidence-index.schema.json": "5d764273b0091eb5aa9f96e5b9b5081bad338482867aa3322d7a85f3d76525fa",
+    "validate.py": "d48bb59c2c085e5bd40d646335248b0951042cd8e96e3bc16d4eac1c75926e3e"
   },
   "manifest_version": 1
 }

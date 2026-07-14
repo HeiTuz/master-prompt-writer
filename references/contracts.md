@@ -20,6 +20,11 @@
 |---|---|---|---|
 | `GardenRecipe v1` | image/design gardener → Master | opaque `ref_*` ID + `sha256:*`만, observation/inference 분리, 근거 confidence, qualified token, identity/subject lock, camera/light/palette evidence, exclusions, intended use | 검증 오류와 함께 컴파일 거부 |
 | `PromptBundle v1` | Master → executor/bridge | validated recipe hash, 단일 `handoff`, 블록별 Unicode code point ≤2,000, lock 보존, variable axes, negatives, reference requirements, QC | handoff 거부; 자동 완화 금지 |
+| `ApparelHandoff v1` | apparel compiler → image producer | 제품 role map·불변 lock·전체 인벤토리·자기완결 프롬프트 | 입력/lock 누락 시 거부 |
+| `ImgGen2ProductionRecord v1` | image producer → QC/recompile | 소스 증거 인덱스·생성 결과·검증 상태 | provenance 또는 결과 불일치 시 거부 |
+| `MPWRecompileRequest v1` | QC → Master | 실패 축·보존 lock·허용 delta를 명시한 재컴파일 요청 | 범위 밖 수정 요구 시 거부 |
+| `ProductionAdapterOptions v1` | Master → runtime adapter | 런타임 중립 옵션만 허용 | 비공개·엔진 고유 key면 거부 |
+| `SourceEvidenceIndex v1` | source inventory → compiler/QC | 해시 기반 증거와 역할 매핑 | 경로·비밀·원문 의존 시 거부 |
 | `generation-handoff/v1` | Master → 모든 실행 adapter | `handoff` 객체만으로 실행 입력·lock·QC 해석 가능, 런타임 고유 key 없음 | adapter가 모르는 protocol이면 거부 |
 | contract mirror | canonical source → independent source/install | manifest와 모든 listed file의 SHA-256 바이트 일치 | drift check 실패 |
 
