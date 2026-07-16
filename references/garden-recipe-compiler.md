@@ -1,6 +1,6 @@
 # GardenRecipe → PromptBundle 컴파일 계약
 
-이 문서는 HeiTuzMPW의 구조화 컴파일·핸드오프 정본이다. GardenRecipe 필드 정의·개인정보 금지·provenance 검증은 `contracts/` 정본을 참조하며 여기서 반복하지 않는다. 이미지 문장 구성 규칙은 `references/image/compiler.md`, 레인 게이트는 `references/templates.md`가 정본이다.
+이 문서는 HeiTuzMPW의 구조화 컴파일·핸드오프 정본이다. GardenRecipe 필드 정의·개인정보 금지·provenance 검증은 `contracts/` 정본을 참조하며 여기서 반복하지 않는다. 이미지 문장 구성 규칙은 `references/image/compiler.md`, 레인 게이트는 `references/image/lanes.md`가 정본이다.
 
 ## 입력 게이트
 
@@ -16,7 +16,7 @@ python3 scripts/compile_garden_recipe.py recipe.json --output prompt-bundle.json
 
 - 원본 GardenRecipe의 canonical hash와 recipe ID
 - mode·engine 및 `generation-handoff/v1` 프로토콜
-- Unicode code point 실측값이 붙은 자기완결 prompt block(각각 1~2000자); mode/engine에 따라 `templates.md` 레인 게이트 렌더러를 적용
+- Unicode code point 실측값이 붙은 자기완결 prompt block(각각 1~2000자); mode/engine에 따라 `references/image/lanes.md` 레인 게이트 렌더러를 적용
 - GardenRecipe와 byte-for-byte 의미가 같은 immutable identity/subject locks
 - 명시적으로 허용된 축만 담는 variable axes; GardenRecipe v1에는 unlock 필드가 없으므로 빈 배열
 - exclusions에서 보존한 negative constraints

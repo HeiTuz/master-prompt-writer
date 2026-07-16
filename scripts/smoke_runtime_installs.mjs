@@ -37,6 +37,7 @@ const required = [
   "references/model-playbooks.md",
   "references/adapters.md",
   "references/image/compiler.md",
+  "references/image/lanes.md",
 ];
 const sharedCore = required.filter((relative) => relative !== "SKILL.md");
 const adapterHeadings = {
@@ -115,7 +116,7 @@ function assertInstalled(home, target) {
   const installDestination = destination(home, target);
   const installed = Object.fromEntries(required.map((relative) => [relative, readInstalled(installDestination, relative)]));
   if (fs.existsSync(path.join(installDestination, "agents"))) fail(`${target}: agents/ leaked into installed payload`);
-  for (const relative of ["SKILL.md", "references/templates.md", "references/model-playbooks.md", "references/adapters.md"]) {
+  for (const relative of ["SKILL.md", "references/templates.md", "references/model-playbooks.md", "references/adapters.md", "references/image/lanes.md"]) {
     checkLinks(installDestination, relative);
   }
   const host = overlayHost(target);

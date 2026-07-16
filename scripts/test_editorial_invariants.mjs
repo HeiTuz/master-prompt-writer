@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// 컨셉-콜리전 에디토리얼 그래머(§15) 불변식 행동 테스트.
+// 컨셉-콜리전 에디토리얼 그래머(editorial/concept-collision.md §15) 불변식 행동 테스트.
 // - 유명 사진 제어구·문화 앵커 보존(positive preservation)
 // - 국적-피부 고정 / malformed 피부 토큰 거절(negative stereotype)
 // - 글로우 토큰 적층 경고 + 매트존으로 해제(token-stack)

@@ -1,6 +1,6 @@
 {
   "authority": "HeiTuzMPW/contracts",
-  "contract_release": "2026-07-13.v2",
+  "contract_release": "2026-07-16.v1",
   "files": {
     "v1/apparel-handoff.schema.json": "b1c418a4c815a4f6ecf7eff409882f215bf821b78300c411614ae920520dcc03",
     "v1/fixtures/apparel-handoff.valid.json": "07cef301565ffeb0fc1f6e1d15b598a815c6fe9455800e88fc80f09a2ba541e4",
@@ -12,7 +12,9 @@
     "v1/fixtures/production-adapter-options.valid.json": "3a843f504af14ae1b8dc796324cec956b0a8fa038fe3eafbca1e5d00908e1369",
     "v1/fixtures/prompt-bundle.valid.json": "ce4a71d165f87b5bda45ca1528ca37c9ea25614feebe1555c6be1c26193e8d80",
     "v1/fixtures/source-evidence-index.valid.json": "5614010b7d0aa795c96b91ff26a48df0dcce6d7cc6a3aa3692bcdc314d30792b",
-    "v1/garden-recipe.schema.json": "95a6c22b0c14cf309eebded66876b14bbab6d2589fe9e1a9fffd5261866db6e3",
+    "v1/fixtures/image-production-handoff.valid.json": "6c286338f5be2d7b43dd9e7db3952ee5148b8dc6dc6323f1c5fd5188a28c6280",
+    "v1/garden-recipe.schema.json": "7347b6663d5bc541c21cc607f6d2a134249cdedb784a102149112372c5c8454c",
+    "v1/image-production-handoff.schema.json": "fd09d09c3a13b8187b8b8471671f2e8bfbf01bc39f77c1a7704422e91b498dcf",
     "v1/imggen2-production-record.schema.json": "8925babb1fbddfbe4603fc2db59e56907128a31e8170080802b55ea5430aff01",
     "v1/mpw-recompile-request.schema.json": "b8fc50ce666a42b54d9373fba80cdb76bba8bfaebe7ba71c000d27e356d12c37",
     "v1/production-adapter-options.schema.json": "540c3b4019f0f39479792fed69ebc6ce21c28cdec33774a986babf06267636bb",

@@ -6,20 +6,21 @@
 
 1. **정본 단일성** — 규칙은 한 곳에서 1회 정의, 다른 파일은 참조만. 같은 규칙을 두 파일에 다시 쓰면 드리프트가 시작된다. 현재 정본 배치:
    - 네거티브 Tier 정책·철칙·사이즈 락: `references/image/compiler.md`
-   - 레인별 게이트(비율·길이·필수 요소): `references/templates.md` §레인 게이트 카드
+   - 레인별 게이트(비율·길이·필수 요소): `references/image/lanes.md` §레인 게이트 카드
+   - 이미지 슬롯 기본값: `references/image/lanes.md` §이미지 슬롯 기본값
    - 추론 불가 슬롯 목록: `references/templates.md` §슬롯 자동 채움
    - jsonl 스키마: `references/image/production.md` §2
-   - 영상 규칙: `references/templates.md` §영상 공통 규칙
+   - 영상 규칙: `references/image/lanes.md` §영상 공통 규칙
 2. **기존 강점 후퇴 금지** — 위임 계약 6요소, 블록당 2000자 실측, 이미지 자기완결, 게이트 필요성 테스트, 레인 게이트 카드.
 3. **예시 라벨 = 실측** — `(N자 실측)` 라벨은 뒤따르는 ```text 블록의 실제 문자수와 정확히 일치해야 한다. 예시를 고치면 라벨을 재계산한다. "약 N자" 표기 금지.
-4. **모델·엔진 주장은 스탬프와 함께** — 근거 없는 모델 능력/플래그 서술 금지. 검증된 주장엔 날짜 스탬프(예: 2026-07 실측), 스탬프 6개월 경과 시 재검증 후 갱신.
+4. **모델·엔진 주장은 스탬프와 함께** — 근거 없는 모델 능력/플래그 서술 금지. 검증된 주장엔 날짜 스탬프(예: (YYYY-MM 실측)), 스탬프 6개월 경과 시 재검증 후 갱신.
 5. **런타임 고유명은 `references/adapters.md`에만** — 코어 파일(SKILL.md·templates.md·image/*)에 특정 에이전트 제품명을 다시 들이지 않는다. 모델·엔진명(gpt-image-2, Higgsfield 등)은 허용.
 
 ## 검증 루틴 (변경 후 필수)
 
 ```sh
 python3 scripts/lint.py               # 항상 — 라벨 실측·2000자·정본 단일성·유사문자
-node scripts/check_prompt.mjs --test  # references/image/ 또는 검증기 변경 시 — 18 fixtures
+node scripts/check_prompt.mjs --test  # references/image/ 또는 검증기 변경 시 — 19 fixtures
 ```
 
 검증기(`check_prompt.mjs`)와 문서 규칙이 어긋나면 어느 쪽이 맞는지 판정하고 한쪽을 고쳐 정렬한다 — 괴리를 남기는 게 최악이다(2026-07 캘리브레이션에서 헤더형 감지·조명 토큰 괴리를 이렇게 잡았다).

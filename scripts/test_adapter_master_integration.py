@@ -133,4 +133,8 @@ class AdapterMasterIntegrationTests(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    missing_roots = [str(path) for path in (IMAGE_ROOT, DESIGN_ROOT, BRIDGE_ROOT) if not path.is_dir()]
+    if missing_roots:
+        print("SKIP: external adapter repos absent (" + ", ".join(missing_roots) + ")")
+        sys.exit(0)
     unittest.main(verbosity=2)

@@ -37,7 +37,7 @@
       "additionalProperties": false,
       "required": ["producer", "producer_version", "analysis_schema_version", "analysis_hash"],
       "properties": {
-        "producer": {"type": "string", "enum": ["image-reference-adapter", "design-reference-adapter", "prompt-knowledge-adapter"]},
+        "producer": {"type": "string", "enum": ["image-reference-adapter", "design-reference-adapter", "prompt-knowledge-adapter", "image-reference-gardener", "design-reference-gardener", "prompt-knowledge-gardener"]},
         "producer_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
         "analysis_schema_version": {"type": "string", "minLength": 1, "maxLength": 128},
         "analysis_hash": {"$ref": "#/$defs/sha256"}

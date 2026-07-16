@@ -11,6 +11,8 @@ const AR_SIZE_MAP = { "1:1":["1024x1024","2048x2048"], "2:3":["1024x1536"], "3:4
 const HARD = { maxEdge:3840, multiple:16, maxRatio:3, minPx:655360, maxPx:8294400 };
 const TIER1 = ["verbatim, no extra characters","no duplicate text","no invented glyphs","no extra words","no extra text","no watermark","no logo"];
 const TAIL = ["no nudity","no nipple or genital exposure","no wardrobe malfunction","no extra people","no text","no watermark"];
+// 동결 스펙 — lint.py 3자 byte 대조용 synchronized copy.
+const SAFETY_ASSERT = "adult Korean woman in her late 20s, 25+, original character, non-nude fashion editorial styling, fully opaque fabric, covered chest line, editorial upright pose";
 const TAIL_ONLY = TAIL.slice(0, 4); // Tier-2 전용 항목 — 이게 있어야 tail로 간주
 const ANCHORS = [/25\+/, /original character/i, /fully opaque/i, /covered (?:chest|bust)/i, /editorial upright/i];
 const REWRITE_MAP = {
@@ -95,6 +97,8 @@ function checkEditorialFinish(p, errors, warnings) {
 function validateText(raw, opts = {}, rec = null) {
   const errors = [], warnings = [];
   const p = raw.replace(/^﻿/, "").trim();
+  const codePoints = [...p].length;
+  if (codePoints > 2000) err(errors, "E-OVERFLOW-2000", `프롬프트 코드포인트 수 ${codePoints}자 — 블록당 2000자를 초과함.`);
   const has = (re) => re.test(p);
   const format = rec && (rec.format === "A" || rec.format === "B") ? rec.format : detectFormat(p);
   const quotes = quotesOf(p);

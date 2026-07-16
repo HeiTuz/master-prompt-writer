@@ -12,26 +12,33 @@ Checks the skill's own hardlines against its files:
   same file.
 - every ```text example block is <= 2000 chars (all core files)
 - no approximate labels (`약 N자`)
-- YAML frontmatter parses and carries version + model_claims_reviewed_at
+- YAML frontmatter parses and carries version + dated model/role review stamps (rejects future dates; re-verify after 6 calendar months)
+- canonical inline `(YYYY-MM 실측...)` measurement stamps are current, non-future, and used across all Markdown
 - no Cyrillic/Greek lookalike letters
 - canonical rules defined exactly once (gate necessity test, non-inferable slot list)
 - package.json version matches SKILL.md frontmatter version
 - runtime/model names stay out of core prompt files except image/video engine names
-- Tier-2 frozen strings byte-identical 3-way: editorial-fashion.md §2 code blocks
-  (SSOT) == compiler.md §2 inline copy == check_prompt.mjs TAIL/ANCHORS constants
+- Tier-2 frozen strings byte-identical 3-way: editorial/tier2-safety.md §2 code blocks
+  (SSOT) == compiler.md §2 inline copy == check_prompt.mjs SAFETY_ASSERT/TAIL constants;
+  ANCHORS remains a containment guard for runtime anchor drift.
 
 Exit 0 on pass, 1 on any failure. No dependencies beyond PyYAML (optional:
 falls back to a minimal frontmatter parse when PyYAML is missing).
 """
-import json, re, sys, unicodedata, pathlib
+import calendar, json, re, sys, unicodedata, pathlib
+from datetime import date
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 FILES = ["SKILL.md", "references/templates.md", "references/model-playbooks.md", "references/adapters.md",
-         "references/image/compiler.md", "references/image/categories.md",
-         "references/image/editorial-fashion.md", "references/image/look-and-concept.md",
+         "references/image/lanes.md", "references/image/compiler.md", "references/image/categories.md",
+         "references/image/editorial-fashion.md", "references/image/editorial/format-b.md",
+         "references/image/editorial/tier2-safety.md", "references/image/editorial/taxonomy-dna.md",
+         "references/image/editorial/photo-vocab.md", "references/image/editorial/scene-craft.md",
+         "references/image/editorial/concept-collision.md", "references/image/look-and-concept.md",
          "references/image/typography.md", "references/image/production.md",
-         "references/image/realism.md"]
-SSOT = "references/image/editorial-fashion.md"   # Tier-2 동결 문자열 정본 (§2 코드블록)
+         "references/image/realism.md", "references/midjourney-character-sheets.md",
+         "references/midjourney-v81-identity.md"]
+SSOT = "references/image/editorial/tier2-safety.md"   # Tier-2 동결 문자열 정본 (§2 코드블록)
 COMPILER = "references/image/compiler.md"
 VALIDATOR = ROOT / "scripts" / "check_prompt.mjs"
 # 라벨 3+1포맷: "N자 실측"(괄호형 포함) / "실측: N자" / bare "(…, N자)" — "블록당 N자"(규칙 문구)와
@@ -39,6 +46,8 @@ VALIDATOR = ROOT / "scripts" / "check_prompt.mjs"
 LABEL_PATTERNS = [r"(?<!블록당 )(?<!\d)(\d+)자 실측", r"실측:\s*(\d+)자", r"(?<!제)(?<!\d)(\d+)자\)"]
 BARE_PATTERN_MIN = 50
 BIND_WINDOW = 200  # 라벨-코드블록 펜스 간 인접 판정 거리(문자)
+MEASUREMENT_STAMP_PATTERN = re.compile(r"\((\d{4})-(\d{2}) 실측[^)\n]*\)")
+REVIEW_STAMP_FIELDS = ("model_claims_reviewed_at", "role_routing_reviewed_at")
 
 
 def fail(msgs):
@@ -57,6 +66,91 @@ def grapheme_unsafe(body):
 
 def line_of(s, pos):
     return s.count("\n", 0, pos) + 1
+
+
+def six_months_before(today):
+    """오늘 기준 6 calendar months 전의 같은 날(없는 날짜는 월말)."""
+    month_index = today.year * 12 + today.month - 1 - 6
+    year, month_zero_based = divmod(month_index, 12)
+    month = month_zero_based + 1
+    return date(year, month, min(today.day, calendar.monthrange(year, month)[1]))
+
+
+def parse_frontmatter(fm, use_yaml=True):
+    """Parse frontmatter consistently with and without optional PyYAML."""
+    if use_yaml:
+        try:
+            import yaml
+        except ImportError:
+            pass
+        else:
+            parsed = yaml.safe_load(fm) or {}
+            metadata = parsed.get("metadata") or {}
+            return parsed.get("version"), {
+                field: value.isoformat() if isinstance(value, date) else value
+                for field, value in metadata.items()
+            }
+
+    vm = re.search(r"^version:\s*([^\n]+)", fm, re.M)
+    version = vm.group(1).strip().strip("\"'") if vm else None
+    metadata = {}
+    # metadata 블록: 들여쓴 항목 + 빈 줄 + 주석 줄까지 포함, 다음 최상위 키에서 종료 (PyYAML과 동일 범위)
+    block = re.search(r"^metadata:\s*\n((?:^(?: {2}.*|[ \t]*(?:#.*)?)(?:\n|$))*)", fm, re.M)
+    if block:
+        for field in REVIEW_STAMP_FIELDS:
+            stamp = re.search(rf"^ {{2}}{field}:\s*(?:\"([^\"\n]*)\"|'([^'\n]*)'|([^#\n]*))", block.group(1), re.M)
+            if stamp:
+                value = next(g for g in stamp.groups() if g is not None).strip()
+                if value:
+                    metadata[field] = value
+    return version, metadata
+
+
+def check_review_stamps(metadata, errors, today):
+    cutoff = six_months_before(today)
+    for field in REVIEW_STAMP_FIELDS:
+        value = metadata.get(field)
+        if isinstance(value, date):
+            value = value.isoformat()
+        if not value:
+            errors.append(f"frontmatter: {field} missing")
+            continue
+        if not isinstance(value, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
+            errors.append(f"frontmatter: {field} must be a YYYY-MM-DD string")
+            continue
+        try:
+            reviewed_at = date.fromisoformat(value)
+        except ValueError:
+            errors.append(f"frontmatter: {field} must be a valid YYYY-MM-DD date")
+            continue
+        if reviewed_at > today:
+            errors.append(f"frontmatter: {field} {value} violates — future-dated review stamp")
+        elif reviewed_at < cutoff:
+            errors.append(f"frontmatter: {field} {value} violates the 6-month re-verification rule (AGENTS.md hardline 4)")
+
+
+def check_measurement_stamps(f, s, errors, today):
+    for match in MEASUREMENT_STAMP_PATTERN.finditer(s):
+        year, month = map(int, match.groups())
+        stamp = match.group(0)
+        line = line_of(s, match.start())
+        if not 1 <= month <= 12:
+            errors.append(f"{f}:{line}: invalid measurement stamp {stamp}")
+        elif (year, month) > (today.year, today.month):
+            errors.append(f"{f}:{line}: measurement stamp {stamp} violates — future-dated measurement stamp")
+        elif (today.year - year) * 12 + today.month - month > 6:
+            errors.append(f"{f}:{line}: measurement stamp {stamp} violates the 6-month re-verification rule (AGENTS.md hardline 4)")
+
+
+def check_measurement_near_misses(f, s, errors):
+    canonical_spans = [match.span() for match in MEASUREMENT_STAMP_PATTERN.finditer(s)]
+    pattern = re.compile(r"실측[^\n]{0,12}\d{4}-\d{2}|\d{4}-\d{2}[^\n]{0,12}실측")
+    for match in pattern.finditer(s):
+        if any(start <= match.start() and match.end() <= end for start, end in canonical_spans):
+            continue
+        errors.append(
+            f"{f}:{line_of(s, match.start())}: noncanonical measurement stamp — use (YYYY-MM 실측) form"
+        )
 
 
 def check_labels(f, s, errors):
@@ -91,7 +185,7 @@ def check_labels(f, s, errors):
 
 
 def check_frozen_strings(texts, errors):
-    """Tier-2 동결 문자열 3자 byte 대조: SSOT(editorial-fashion §2) / compiler.md 인라인 / check_prompt.mjs."""
+    """Tier-2 동결 문자열 3자 byte 대조: SSOT(editorial/tier2-safety.md §2) / compiler.md 인라인 / check_prompt.mjs SAFETY_ASSERT 상수."""
     ssot = texts.get(SSOT, "")
     comp = texts.get(COMPILER, "")
 
@@ -123,6 +217,11 @@ def check_frozen_strings(texts, errors):
         errors.append("check_prompt.mjs: TAIL 상수를 찾지 못함")
     elif ", ".join(re.findall(r'"([^"]*)"', mt.group(1))).encode("utf-8") != t.encode("utf-8"):
         errors.append("check_prompt.mjs: TAIL 상수가 SSOT NEGATIVE_TAIL과 byte 불일치")
+    va = re.search(r'const SAFETY_ASSERT = "([^"]*)";', mjs)
+    if not va:
+        errors.append("check_prompt.mjs: SAFETY_ASSERT 상수를 찾지 못함")
+    elif va.group(1).encode("utf-8") != a.encode("utf-8"):
+        errors.append("check_prompt.mjs: SAFETY_ASSERT 상수가 SSOT SAFETY_ASSERT과 byte 불일치")
     ma = re.search(r"const ANCHORS = \[(.*?)\];", mjs)
     if not ma:
         errors.append("check_prompt.mjs: ANCHORS 상수를 찾지 못함")
@@ -137,10 +236,16 @@ def check_frozen_strings(texts, errors):
 
 def main():
     errors = []
+    today = date.today()
     missing = [f for f in FILES if not (ROOT / f).exists()]
     if missing:
         fail([f"missing file: {m}" for m in missing])
     texts = {f: (ROOT / f).read_text(encoding="utf-8") for f in FILES}
+    stamp_files = ["SKILL.md", "AGENTS.md", "README.md"] + [
+        path.relative_to(ROOT).as_posix()
+        for path in sorted((ROOT / "references").rglob("*.md"))
+    ]
+    stamp_texts = {f: (ROOT / f).read_text(encoding="utf-8") for f in stamp_files}
 
     # frontmatter
     skill = texts["SKILL.md"]
@@ -149,19 +254,10 @@ def main():
         errors.append("SKILL.md: no frontmatter")
     else:
         fm = m.group(1)
-        skill_version = None
-        try:
-            import yaml
-            d = yaml.safe_load(fm)
-            skill_version = d.get("version")
-            if not skill_version: errors.append("frontmatter: version missing")
-            if not d.get("metadata", {}).get("model_claims_reviewed_at"):
-                errors.append("frontmatter: model_claims_reviewed_at missing")
-        except ImportError:
-            vm = re.search(r"^version:\s*([^\n]+)", fm, re.M)
-            skill_version = vm.group(1).strip().strip('"') if vm else None
-            if not skill_version: errors.append("frontmatter: version missing")
-            if "model_claims_reviewed_at" not in fm: errors.append("frontmatter: model_claims_reviewed_at missing")
+        skill_version, metadata = parse_frontmatter(fm)
+        if not skill_version:
+            errors.append("frontmatter: version missing")
+        check_review_stamps(metadata, errors, today)
 
         try:
             pkg_version = json.loads((ROOT / "package.json").read_text(encoding="utf-8")).get("version")
@@ -175,6 +271,11 @@ def main():
     # label == adjacent block length (전 FILES)
     for f, s in texts.items():
         check_labels(f, s, errors)
+
+    # dated measurement stamps and near-misses (SKILL.md, AGENTS.md, README.md, references/**/*.md)
+    for f, s in stamp_texts.items():
+        check_measurement_stamps(f, s, errors, today)
+        check_measurement_near_misses(f, s, errors)
 
     # all example blocks under 2000 (전 FILES)
     for f, s in texts.items():

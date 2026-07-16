@@ -185,5 +185,15 @@
         "E-SIZE-RATIO"
       ]
     }
+  },
+  {
+    "path": "fixtures/bad/overflow_2000.txt",
+    "mode": "text",
+    "expect": {
+      "ok": false,
+      "codes": [
+        "E-OVERFLOW-2000"
+      ]
+    }
   }
 ]

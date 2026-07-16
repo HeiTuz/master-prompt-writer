@@ -1,4 +1,4 @@
-이미지 프롬프트 컴파일러 소관: gpt-image-2용 한국어 프로덕션 프롬프트를 구조·텍스트·비율까지 완성한다. 우선순위: ../templates.md §레인 게이트 카드가 이 파일보다 우선.
+이미지 프롬프트 컴파일러 소관: gpt-image-2용 한국어 프로덕션 프롬프트를 구조·텍스트·비율까지 완성한다. 우선순위: lanes.md §레인 게이트 카드가 이 파일보다 우선.
 
 # gpt-image-2 프롬프트 컴파일러
 
@@ -11,7 +11,7 @@
 |---|---|
 | 카테고리별 컷타입·필수 디테일·DNA (C1~C12) | [categories.md](categories.md) |
 | 렌더 텍스트·레이아웃·내부 그리드·한글 정확도 레버 | [typography.md](typography.md) |
-| 화보 Format B·Tier-2 페어·패션 택소노미·포즈/조명/소재 어휘·한국 로컬리티·컨셉-콜리전 그래머·Soul 교차 | [editorial-fashion.md](editorial-fashion.md) |
+| 화보 Format B·Tier-2 페어·패션 택소노미·포즈/조명/소재 어휘·한국 로컬리티·컨셉-콜리전 그래머·Soul 교차 | [editorial-fashion.md](editorial-fashion.md) (라우터에서 필요한 §의 파일만 로드) |
 | 무드→룩 프리셋·컨셉 변수 축·죽은 단어 환원 | [look-and-concept.md](look-and-concept.md) |
 | 정보성 C7 카드 vs 디자인 홍보물 분기·P1~P8 점진 로딩·promo 게이트 | [promo-router.md](promo-router.md) |
 | jsonl 스키마·배치/챕터·모델 팩트·검증기 에러 코드 | [production.md](production.md) |
@@ -61,7 +61,7 @@
 
    Tier-1 결합 공식(문서가 권장하는 유일한 방출형 1줄): `All text appears once, perfectly legible — no duplicate text, no extra words, no invented glyphs, no watermark.`
 
-   Tier-2 고정 문자열 — SAFETY_ASSERT: `adult Korean woman in her late 20s, 25+, original character, non-nude fashion editorial styling, fully opaque fabric, covered chest line, editorial upright pose` / NEGATIVE_TAIL: `no nudity, no nipple or genital exposure, no wardrobe malfunction, no extra people, no text, no watermark` (순서 보존 부분집합만 허용, tail 단독 사용 금지). **정본: [editorial-fashion.md](editorial-fashion.md) §2 코드블록** — 이 줄은 인라인 복사본이며, `scripts/lint.py`가 정본·이 복사본·검증기 상수를 byte 대조한다.
+   Tier-2 고정 문자열 — SAFETY_ASSERT: `adult Korean woman in her late 20s, 25+, original character, non-nude fashion editorial styling, fully opaque fabric, covered chest line, editorial upright pose` / NEGATIVE_TAIL: `no nudity, no nipple or genital exposure, no wardrobe malfunction, no extra people, no text, no watermark` (순서 보존 부분집합만 허용, tail 단독 사용 금지). **정본: [editorial/tier2-safety.md](editorial/tier2-safety.md) §2 코드블록** — 이 줄은 인라인 복사본이며, `scripts/lint.py`가 정본·이 복사본·검증기 상수를 byte 대조한다.
 
    | 빼려는 것 | 레인 |
    |---|---|
@@ -77,7 +77,7 @@
 7. **이상적 피부 금지.** 피부는 `natural skin texture, visible pores, subtle film grain`로 쓴다.
 8. **실재 상표·실존 인물 참조 금지.** 가상 브랜드/페르소나만 쓴다. 프롬프트 메타에서 모델명·도구명·파일 경로를 말하는 것과 이미지 내용에 실재 상표·인물을 넣는 것은 다른 규칙이다.
 9. **생성 후 글자 후처리 절대 금지.** 모든 텍스트는 **프롬프트로 이미지 안에서** 렌더한다. 따옴표 카피 + 롤 라벨 + 자유 작성 존으로 처리한다. 생성된 PNG 위에 코드로 글자를 얹는 합성(PIL/Pillow·ImageMagick·SVG/HTML 오버레이·캔버스 캡처 등)은 금지한다. 폰트·커닝·톤이 원본과 겉돌아 결과물을 망친다. 글자가 틀리면 후처리로 때우지 말고 **프롬프트를 고쳐 재생성**한다. 순서는 타이포 구체화 → `2048x2048` + quality high → 카피 수 축소다.
-10. **하중 토큰은 결과와 병기(qualified token).** 필름/룩 이름·조명 패턴·기법(over/underexposure, soft focus, vignetting)·무드 라벨은 **단독 명사로 두지 않는다** — 그 단어가 화면에 만드는 결과를 같은 절에 붙인다. 예: `Kodak Portra 400 film photography, warm creamy skin tones, low contrast`(O) / `Portra 400.`(X). 배치는 조합 공식 `[필름/룩] + [빛의 방향] + [노출 방식] + [색감] + [그레인] + [분위기]`를 따르고, 감성 라벨(웨딩 필름·숲속 무드 등)은 반드시 필름/룩 이름과 병기한다. 스톡·기법·감성별 결과 사전은 [editorial-fashion.md](editorial-fashion.md) §7.4.
+10. **하중 토큰은 결과와 병기(qualified token).** 필름/룩 이름·조명 패턴·기법(over/underexposure, soft focus, vignetting)·무드 라벨은 **단독 명사로 두지 않는다** — 그 단어가 화면에 만드는 결과를 같은 절에 붙인다. 예: `Kodak Portra 400 film photography, warm creamy skin tones, low contrast`(O) / `Portra 400.`(X). 배치는 조합 공식 `[필름/룩] + [빛의 방향] + [노출 방식] + [색감] + [그레인] + [분위기]`를 따르고, 감성 라벨(웨딩 필름·숲속 무드 등)은 반드시 필름/룩 이름과 병기한다. 스톡·기법·감성별 결과 사전은 [editorial/photo-vocab.md](editorial/photo-vocab.md) §7.4.
 
 ### 발전: 철칙 위반 증상 → 원인 역추적 표
 
@@ -160,7 +160,7 @@ API는 커스텀이지만 러너 프리셋 경로는 아래 6종으로 잠근다
 | **C2 뷰티** | **C5 캠페인** | **C6 인포그래픽** | **C7 카드뉴스** |
 | **C8 브랜딩 목업** | **C9 3D 아이콘** | **C10 만화** | **C12 프레젠테이션 덱** |
 
-복잡 도표·도해는 회피하지 말고 정면 시도한다. C6 돌파 전술 + 유형별 레시피 7종(분기 플로우·네트워크·계층·사이클·단면·비교표·데이터 차트)을 적용한다. 연결·노드·수치를 문장으로 구체 지정하고, 수치는 큰 타이포 + 비율감 도형 이중 앵커로 둔다. 안 나오면 단순화 대신 축 변경: 레이아웃 구체화 → 2048 고밀도 → 컷 분할. 고밀도 텍스트 슬라이드는 렌더 한글 **400~800자도 가능**(실측 2026-07, 40컷). 세로 높은 비율(16:9·2:3) + 자유 작성 존이 레버다. 이 밀도에서 소규모 오탈자·간헐 뭉개짐은 정상 산출이므로 치명 카피만 따옴표로 지키고 걸리는 컷만 재생성한다. 후처리 합성은 철칙 9로 금지다. C6·C7은 **밀도가 기본값**이다. 미니멀 플로우·매거진 여백형은 요청이 명시할 때만 쓴다(실측: 나이브 고밀도 컷에 짐).
+복잡 도표·도해는 회피하지 말고 정면 시도한다. C6 돌파 전술 + 유형별 레시피 7종(분기 플로우·네트워크·계층·사이클·단면·비교표·데이터 차트)을 적용한다. 연결·노드·수치를 문장으로 구체 지정하고, 수치는 큰 타이포 + 비율감 도형 이중 앵커로 둔다. 안 나오면 단순화 대신 축 변경: 레이아웃 구체화 → 2048 고밀도 → 컷 분할. 고밀도 텍스트 슬라이드는 렌더 한글 **400~800자도 가능**(2026-07 실측, 40컷). 세로 높은 비율(16:9·2:3) + 자유 작성 존이 레버다. 이 밀도에서 소규모 오탈자·간헐 뭉개짐은 정상 산출이므로 치명 카피만 따옴표로 지키고 걸리는 컷만 재생성한다. 후처리 합성은 철칙 9로 금지다. C6·C7은 **밀도가 기본값**이다. 미니멀 플로우·매거진 여백형은 요청이 명시할 때만 쓴다(실측: 나이브 고밀도 컷에 짐).
 
 ## 9. 양산·레퍼런스 경계
 
@@ -172,7 +172,7 @@ API는 커스텀이지만 러너 프리셋 경로는 아래 6종으로 잠근다
 | 컨셉 축 | 미학 사조 10종(M1~M10), 몸 반응 번역 8종(R축), 모순쌍 레이어 분리(X축), 컬러 번역, 타이포 아트 4기법(T1~T4), 컨셉 프리플라이트, 양산 스윕 패턴. |
 | 타이포·레이아웃 | 영역 문법·롤 라벨·폰트 어휘·정확 문자열·그리드. |
 | 화보 | 포맷 B·슬롯 12종·Tier-2 고정 문구 상세판. 로컬 상세판이 있으면 그 문서를 우선한다. |
-| 사진 어휘 | 카메라·조명·필름·구도·색 어휘는 결과 기반으로 쓴다. 한국 로컬리티·뷰티/패션 안전 매트릭스는 editorial-fashion.md §13을 따른다. 국문/영문 혼용 규칙은 이 파일 §7과 같은 원칙이다. |
+| 사진 어휘 | 카메라·조명·필름·구도·색 어휘는 결과 기반으로 쓴다. 한국 로컬리티·뷰티/패션 안전 매트릭스는 editorial/tier2-safety.md §13을 따른다. 국문/영문 혼용 규칙은 이 파일 §7과 같은 원칙이다. |
 | 패션 분류 | 패션 21종 + persona DNA + MASTER_TEMPLATE 계열. |
 
 생성·양산 실행은 러너 소관이다. 단일 1장도 이 파일의 산출은 프롬프트 컴파일까지다.
