@@ -102,7 +102,7 @@
 | `한낮 12시 캘리포니아 해변, 아이스크림 먹으며 듣는 신나는 팝송` | `#FFD54F` 모래빛 60 / `#4FC3F7` 한낮 바다 30 / `#FF7043` 아이스크림 10 |
 | `밤 9시, 불빛 반짝이는 한강다리를 건너며 듣는 피아노곡` | `#101A2E` 밤 강물 60 / `#D9A566` 다리 조명 25 / `#5EEAD4` 수면 반사 15 |
 
-## 9. T축 — 타이포 아트 4기법
+## 9. T축 — 타이포 아트 5기법
 
 렌더 텍스트를 다루므로 Tier-1 결합 공식 1회가 필수다. 한글 카피는 캔버스 크기 레버 `2048`을 적용한다. 영역 문법은 `typography.md`를 참조한다.
 
@@ -112,6 +112,7 @@
 | T2 의성어·의태어 번역 | 소리의 결을 글자 형태로 옮긴다. 감정·장면을 더하면 결이 달라진다. | 의성어 선정 → 감정/장면 추가 → weight·edge로 번역 | `letterforms shaped by the texture of the sound "{의성어}" felt through {감정/장면}, weight and edges following the sound` | `Text-in-image: headline "사르르" — letterforms melting like butter on a warm pan: edges softening and gently drooping, the last syllable dissolving into a thin glossy pool beneath the baseline, weight thinning from first glyph to last. Warm butter yellow #F2B705 on cream field #FFF9F2.` |
 | T3 의도 왜곡 | 왜곡 방향을 먼저 설계하고 그 방향으로만 일그러뜨린다. | 왜곡 방향 후보 나열 → 1개 선택 → 위치·강도 설계 → 가독 한계선 명시 | `deliberately distorted lettering — {선택한 왜곡} applied with intent, distortion stopping just before legibility breaks` | `Text-in-image: headline "야시장" — deliberately distorted lettering: each glyph sliced horizontally at its waist, the upper half shifted slightly right like a mis-registered print, distortion stopping just before legibility breaks. Hot pink #F25C9B strokes with an electric mint #5EEAD4 offset layer on near-black #0B0D12.` |
 | T4 네거티브 스페이스 | 글자 속 여백에 상징을 숨긴다. 두 번째 봤을 때 발견되는 구조다. | 효과 좋은 글자 선택 → 카운터스페이스 지정 → 상징 1개 삽입 → 나머지 획 정리 | `a {상징} subtly hidden in the counterspace of the letter {글자}, invisible at first glance, discovered on the second` | `Text-in-image: wordmark "소풍" — a tiny kite silhouette subtly hidden inside the round counterspace of "ㅇ", invisible at first glance, discovered on the second look; every other stroke kept clean and geometric. Single ink #111111 on warm paper field #F5F1E8.` |
+| T5 글자 안의 세계 | 글자 외곽을 창으로 삼아 내부에 하나의 축소 장면을 보이게 한다. | 글자 1개 선택 → 내부 장면 1개 지정 → 외곽선·내부 경계 분리 → 장면 규모를 글자 안에 고정 | `a miniature {scene} contained entirely within the letter {글자}, the letter's outer silhouette remaining crisp and readable` | `Text-in-image: headline "밤" — a miniature night market contained entirely within the counter and strokes of "밤": tiny warm stalls and hanging bulbs receding along one narrow lane, every scene element clipped to the letterforms; the outer silhouette remains crisp and readable. Deep navy #101A2E, warm lamp gold #D9A566, cream #F3EEE2.` |
 
 | T축 보조 사실 | 값 |
 |---|---|

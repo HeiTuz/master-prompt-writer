@@ -10,12 +10,16 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 ROUTER = ROOT / "references" / "image" / "promo-router.md"
 GOOD_FIXTURES = ROOT / "scripts" / "fixtures" / "good" / "promo_patterns.jsonl"
+CONCEPT = ROOT / "references" / "image" / "look-and-concept.md"
+COMPILER = ROOT / "references" / "image" / "compiler.md"
 
 
 class PromoContractTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.router = ROUTER.read_text(encoding="utf-8")
+        cls.concept = CONCEPT.read_text(encoding="utf-8")
+        cls.compiler = COMPILER.read_text(encoding="utf-8")
         cls.records = [
             json.loads(line)
             for line in GOOD_FIXTURES.read_text(encoding="utf-8").splitlines()
@@ -52,12 +56,16 @@ class PromoContractTests(unittest.TestCase):
             self.assertLessEqual(len(record["finishing_devices"]), 3)
             self.assertEqual(prompt.count(record["korean_copy"]), 1)
 
-    def test_only_implemented_look_and_typography_ranges_are_routed(self) -> None:
+    def test_only_implemented_look_range_is_routed(self) -> None:
         self.assertIn("L1~L8", self.router)
-        self.assertIn("T1~T4", self.router)
-        self.assertIn("L9", self.router)
-        self.assertIn("T5", self.router)
-        self.assertIn("추가하지 않는다", self.router)
+        self.assertRegex(self.router, r"구현 본문이 없는 L9는 라우팅·기능으로 추가하지 않는다")
+
+    def test_typography_axis_is_defined_once_and_referenced_by_compiler(self) -> None:
+        definitions = self.concept.split("## 9. T축", 1)[1].split("| T축 보조 사실", 1)[0]
+        for index in range(1, 6):
+            self.assertEqual(1, len(re.findall(rf"^\| T{index} ", definitions, re.MULTILINE)))
+        self.assertIn("T1~T5", self.compiler)
+        self.assertNotIn("T1~T5", self.router)
 
 
 if __name__ == "__main__":

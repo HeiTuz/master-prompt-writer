@@ -239,6 +239,36 @@ function validatePromo(rec, errors) {
     err(errors, "E-PROMO-METAUI", "P5는 실제 앱 스크린샷이 아니라 인쇄된 메타 UI 그래픽이어야 함.");
 }
 
+function validateTypographyPoster(rec, errors) {
+  const isTp = typeof rec.tp_pattern === "string" || rec.cut_type === "typography_poster";
+  if (!isTp) return;
+  const patterns = new Set(Array.from({ length: 14 }, (_, i) => `TP${i + 1}`));
+  if (!patterns.has(rec.tp_pattern)) err(errors, "E-TP-PATTERN", "typography_poster는 TP1~TP14 중 정확히 하나가 필요.");
+  if (!["exact_primary", "repeated_texture"].includes(rec.legibility_target))
+    err(errors, "E-TP-LEGIBILITY", "legibility_target은 exact_primary 또는 repeated_texture여야 함.");
+  if (rec.legibility_target === "repeated_texture" && !["TP2", "TP14"].includes(rec.tp_pattern))
+    err(errors, "E-TP-LEGIBILITY", "repeated_texture는 반복/미세 텍스트 패턴 TP2 또는 TP14에서만 허용.");
+  if (!Array.isArray(rec.palette_sources) || rec.palette_sources.length !== 1 || rec.palette_sources[0] !== "TP")
+    err(errors, "E-TP-PALETTE", "TP 팔레트 권한은 TP 단일 소스여야 함.");
+  if (!Array.isArray(rec.palette) || rec.palette.length < 2 || rec.palette.length > 4)
+    err(errors, "E-TP-PALETTE-RANGE", "TP 팔레트는 HEX 2~4개여야 함.");
+  if (rec.material_graft !== undefined && (typeof rec.material_graft !== "string" || !/^TP7 surface material: \S(?:.*\S)?$/.test(rec.material_graft)))
+    err(errors, "E-TP-GRAFT", "material_graft는 `TP7 surface material: <nonempty description>` 형식의 단일 TP7 표면 재질 이식 설명이어야 함.");
+  else if (rec.material_graft !== undefined && !["TP2", "TP3"].includes(rec.tp_pattern))
+    err(errors, "E-TP-GRAFT", "material_graft는 TP7 표면 재질을 TP2 또는 TP3에 이식할 때만 허용.");
+  const prompt = typeof rec.full_prompt === "string" ? rec.full_prompt : "";
+  if (rec.legibility_target === "exact_primary" && !/"[^"\n]*\S[^"\n]*"/.test(prompt))
+    err(errors, "E-TP-EXACT-PRIMARY", "exact_primary는 full_prompt에 비어 있지 않은 큰따옴표 primary copy가 필요.");
+  if (rec.legibility_target === "repeated_texture" && /no duplicate text/i.test(prompt))
+    err(errors, "E-TP-DUP-GUARD", "repeated_texture TP2/TP14에는 no duplicate text를 쓰지 않음.");
+  if (rec.legibility_target === "repeated_texture" && !/text-like texture|text-like micro|미세.*텍스처|반복.*텍스처/i.test(prompt))
+    err(errors, "E-TP-TEXTURE", "repeated_texture는 반복부를 비판독 텍스처로 선언해야 함.");
+  if (rec.legibility_target === "repeated_texture" && (!/no invented glyphs/i.test(prompt) || !/no watermark/i.test(prompt)))
+    err(errors, "E-TP-REPEATED-GUARDS", "repeated_texture TP2/TP14에는 no invented glyphs와 no watermark 가드가 모두 필요.");
+  if (rec.legibility_target === "exact_primary" && !/no duplicate text/i.test(prompt))
+    err(errors, "E-TP-EXACT-GUARD", "exact_primary는 no duplicate text 가드가 필요.");
+}
+
 function validateRecord(rec, ids, opts) {
   const errors = [], warnings = [];
   for (const f of ["id", "category", "ar", "size", "quality", "full_prompt", "output_path"])
@@ -256,6 +286,7 @@ function validateRecord(rec, ids, opts) {
   if (rec.ar && rec.size && AR_SIZE_MAP[rec.ar] && !AR_SIZE_MAP[rec.ar].includes(rec.size))
     err(errors, "E-SIZE-AR", `ar ${rec.ar} ↔ size ${rec.size} 매핑 불일치(허용: ${AR_SIZE_MAP[rec.ar].join(", ")}).`);
   validatePromo(rec, errors);
+  validateTypographyPoster(rec, errors);
   let t = { format: rec.format ?? null, tier: rec.tier ?? null };
   if (typeof rec.full_prompt === "string") {
     const m = rec.full_prompt.trim().match(/AR\s+(\d+)\s*:\s*(\d+)$/i);

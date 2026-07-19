@@ -195,5 +195,18 @@
         "E-OVERFLOW-2000"
       ]
     }
+  },
+  {
+    "path": "fixtures/good/typography_poster.jsonl",
+    "mode": "jsonl",
+    "expect": { "ok": true }
+  },
+  {
+    "path": "fixtures/bad/typography_poster.jsonl",
+    "mode": "jsonl",
+    "expect": {
+      "ok": false,
+      "codes": ["E-TP-PALETTE", "E-TP-PALETTE-RANGE", "E-TP-DUP-GUARD", "E-TEXT-QUOTE", "E-TP-LEGIBILITY", "E-TP-GRAFT", "E-TP-REPEATED-GUARDS", "E-TP-EXACT-GUARD", "E-TP-EXACT-PRIMARY", "E-TP-TEXTURE"]
+    }
   }
 ]

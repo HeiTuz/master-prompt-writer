@@ -52,6 +52,10 @@
 | `lane` | `standard` 또는 `editorial` | `editorial`이면 tier 2. |
 | `palette` | HEX 배열 | full_prompt 반영 누락 시 `W-PALETTE-MISS`. |
 | `promo_pattern` | `P1`~`P8` | `cut_type: promo_poster`일 때 필수. 선택 파일은 `promo-router.md` 정본. |
+| `tp_pattern` | `TP1`~`TP14` | `cut_type: typography_poster`일 때 필수. 라우팅·공통 계약은 `typography-poster-router.md`, 패턴별 관찰 시그니처·실패·재시도 계약은 `typography-poster-patterns.md` 정본. |
+| `legibility_target` | `exact_primary` 또는 `repeated_texture` | TP 타이포의 정확 카피/반복 텍스처 의미를 고정한다. TP2·TP14만 `repeated_texture`. |
+| `palette_sources` | TP 포스터는 `["TP"]` | 구조·팔레트 권한을 단일화한다. promo는 기존 P/L 규칙을 따른다. |
+| `material_graft` | 선택 문자열 | TP7 재질을 TP2/TP3 표면에 이식할 때만 사용하며 두 번째 구조 권한자가 될 수 없다. |
 | `look_preset` | `L1`~`L8` | promo에서 필수. L9는 구현 본문이 없어 금지. |
 | `promo_text_effect` | P별 canonical effect | P1 mask, P2 extrusion, P3/P6 occlusion, P4 interlock, P5 printed_meta_ui, P7 rotated_axis, P8 staging. |
 | `promo_subject` | 비어 있지 않은 문자열 | 타이포와 물리적으로 얽히는 주 피사체. `full_prompt`에 그대로 등장해야 한다. |
@@ -241,7 +245,22 @@ Reply only with the saved file path.
 | `E-WEIGHT` | `(word:1.3)` 가중치 문법 | 자연어 서술로 교체. |
 | `E-MJ-FLAG` | `--ar/--v/--no`식 플래그 | jsonl 필드와 끝 AR 토큰으로 교체. |
 
-### 9.3 텍스트·티어·네거티브
+### 9.3 TP 타이포그래피 포스터
+
+| 코드 | 조건 | 조치 |
+|---|---|---|
+| `E-TP-PATTERN` | TP1~TP14 밖이거나 패턴 누락 | TP 하나를 선택. |
+| `E-TP-LEGIBILITY` | 레그빌리티 값 누락 또는 TP2/TP14 밖의 `repeated_texture` | 허용 패턴과 목표를 정렬. |
+| `E-TP-PALETTE` | 팔레트 권한이 `["TP"]` 단일 소스가 아님 | TP 하나만 권한자로 기록. |
+| `E-TP-PALETTE-RANGE` | TP 팔레트가 HEX 2~4개 밖 | TP 우선 범위 2~4개로 수정. |
+| `E-TP-GRAFT` | TP7 표면 재질 형식·대상 위반 | `TP7 surface material: …`을 TP2/TP3에만 사용. |
+| `E-TP-DUP-GUARD` | 반복 텍스처에 `no duplicate text` 사용 | 반복부에서 해당 가드를 제거. |
+| `E-TP-TEXTURE` | 반복부의 텍스처 선언 누락 | 비판독 `text-like texture`로 선언. |
+| `E-TP-REPEATED-GUARDS` | 반복 텍스처의 잔여 가드 누락 | `no invented glyphs`와 `no watermark`를 모두 추가. |
+| `E-TP-EXACT-PRIMARY` | exact primary의 따옴표 카피 누락 | 주 카피를 따옴표 안에 고정. |
+| `E-TP-EXACT-GUARD` | exact primary의 중복 방지 가드 누락 | `no duplicate text`를 추가. |
+
+### 9.4 텍스트·티어·네거티브
 
 | 코드 | 조건 | 조치 |
 |---|---|---|
@@ -255,7 +274,7 @@ Reply only with the saved file path.
 | `E-TIER2-POS` | NEGATIVE_TAIL이 AR 직전이 아님 | AR 직전 마지막 절로 이동. |
 | `E-TIER2-PAIR` | tail 단독 사용 | SAFETY_ASSERT 앵커 3개 이상과 페어. |
 
-### 9.4 promo 라우팅·게이트
+### 9.5 promo 라우팅·게이트
 
 | 코드 | 조건 | 조치 |
 |---|---|---|
@@ -273,7 +292,7 @@ Reply only with the saved file path.
 | `E-PROMO-KO-MASK-LEN` | 한글 마스킹·압출이 3음절 이상 | 2음절로 축소하거나 효과 변경. |
 | `E-PROMO-METAUI` | P5가 실제 앱 화면으로 읽힘 | 인쇄된 메타 그래픽으로 재서술. |
 
-### 9.5 워닝
+### 9.6 워닝
 
 | 코드 | 조건 | 조치 |
 |---|---|---|
