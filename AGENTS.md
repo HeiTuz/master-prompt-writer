@@ -1,6 +1,13 @@
 # AGENTS.md — 이 레포에서 일하는 에이전트 규칙
 
-이 레포는 **MPW 스킬의 정본**이다. 배포 정본은 이 git 저장소와 `github:HeiTuz/MPW`이며, `~/.hermes/skills/…` 같은 설치 트리는 배포 산출물이다 — 설치 트리에서 편집한 규칙은 **이 저장소로 업스트림되어 푸시되기 전까지 배포되지 않은 것**이다.
+이 레포는 **MPW 스킬의 정본이자 유일한 실제 트리**다(2026-07-25 구조 전환). 하네스는 여기를 소비만 한다:
+
+- `~/.claude/skills/MPW` — 런타임 멤버(SKILL.md·references·contracts·scripts·examples·package.json·LICENSE·README.md·AGENTS.md) 심링크
+- `~/.hermes/skills/prompt-writing/MPW` — 동일
+
+**레포 루트를 통째로 심링크하지 않는다.** `agents/`는 installer 오버레이 원본이고 설치본에는 들어간 적이 없는데, 루트를 심링크하면 hermes 인덱서가 `agents/claude/SKILL.md`·`agents/codex/SKILL.md`를 활성 스킬로 잡아 **같은 이름의 MPW가 3개**가 된다((2026-07 실측), 2026-07-25 확인). 런타임 멤버만 링크해 기존 배포 표면을 그대로 재현한다. 최상위 런타임 파일을 새로 추가하면 양쪽 링크도 추가해야 하며, 빠뜨리면 `~/.hermes/scripts/prompt_writing_doctrine_check.py`가 주간으로 잡는다.
+
+편집은 여기서 한다 — 설치 경로에서 편집하지 않는다. 그게 v2.11~v2.13이 사라진 원인이었다. 공개 배포(`github:HeiTuz/MPW`)는 푸시 이후에만 유효하다.
 
 ## 하드라인 (위반 = 완료 아님)
 
