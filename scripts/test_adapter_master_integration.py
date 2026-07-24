@@ -13,20 +13,38 @@ from typing import Any
 MASTER_ROOT = Path(__file__).resolve().parents[1]
 
 
-def skill_root(env_name: str, skill_name: str) -> Path:
+def skill_root(env_name: str, *skill_names: str) -> Path:
+    """Resolve a companion skill root, tolerating the adapter→gardener rename.
+
+    The loop scripts were renamed alongside their skills; probe every known
+    directory name so a rename fails the assertion under test rather than
+    erroring out of setUpClass with a missing-dependency message."""
     configured = os.environ.get(env_name)
     if configured:
         return Path(configured)
     candidates = [
-        MASTER_ROOT.parent / skill_name,
-        Path.home() / "src" / skill_name,
-        Path.home() / ".hermes" / "skills" / "prompt-writing" / skill_name,
+        base / skill_name
+        for skill_name in skill_names
+        for base in (
+            MASTER_ROOT.parent,
+            Path.home() / "src",
+            Path.home() / ".hermes" / "skills" / "prompt-writing",
+        )
     ]
     return next((path for path in candidates if path.is_dir()), candidates[0])
 
 
-IMAGE_ROOT = skill_root("IMAGE_REFERENCE_ADAPTER_ROOT", "image-reference-adapter")
-DESIGN_ROOT = skill_root("DESIGN_REFERENCE_ADAPTER_ROOT", "design-reference-adapter")
+IMAGE_ROOT = skill_root("IMAGE_REFERENCE_ADAPTER_ROOT", "image-reference-gardener", "image-reference-adapter")
+DESIGN_ROOT = skill_root("DESIGN_REFERENCE_ADAPTER_ROOT", "design-reference-gardener", "design-reference-adapter")
+# The per-skill loop module kept its old name in some installs.
+LOOP_FILENAMES = ("gardener_loop.py", "adapter_loop.py")
+
+
+def loop_path(root: Path) -> Path:
+    return next(
+        (root / "scripts" / name for name in LOOP_FILENAMES if (root / "scripts" / name).is_file()),
+        root / "scripts" / LOOP_FILENAMES[0],
+    )
 BRIDGE_ROOT = skill_root("HIGGSFIELD_BRIDGE_ROOT", "higgsfield-prompt-bridge")
 CONTRACT_ROOT = Path(os.environ.get("MASTER_PROMPT_CONTRACT_ROOT", MASTER_ROOT / "contracts"))
 COMPILER_ROOT = Path(os.environ.get("MASTER_PROMPT_COMPILER_ROOT", MASTER_ROOT))
@@ -49,8 +67,8 @@ class AdapterMasterIntegrationTests(unittest.TestCase):
             CONTRACT_ROOT / "v1/fixtures/garden-recipe.image.valid.json",
             CONTRACT_ROOT / "v1/fixtures/garden-recipe.design.valid.json",
             COMPILER_ROOT / "scripts/compile_garden_recipe.py",
-            IMAGE_ROOT / "scripts/adapter_loop.py",
-            DESIGN_ROOT / "scripts/adapter_loop.py",
+            loop_path(IMAGE_ROOT),
+            loop_path(DESIGN_ROOT),
             BRIDGE_ROOT / "scripts/higgsfield_job.py",
         ]
         missing = [str(path) for path in required if not path.is_file()]
@@ -59,8 +77,8 @@ class AdapterMasterIntegrationTests(unittest.TestCase):
         os.environ["MASTER_PROMPT_CONTRACT_ROOT"] = str(CONTRACT_ROOT)
         cls.contracts = load_module("integration_contracts", CONTRACT_ROOT / "validate.py")
         cls.compiler = load_module("integration_compiler", COMPILER_ROOT / "scripts/compile_garden_recipe.py")
-        cls.image_loop = load_module("integration_image_loop", IMAGE_ROOT / "scripts/adapter_loop.py")
-        cls.design_loop = load_module("integration_design_loop", DESIGN_ROOT / "scripts/adapter_loop.py")
+        cls.image_loop = load_module("integration_image_loop", loop_path(IMAGE_ROOT))
+        cls.design_loop = load_module("integration_design_loop", loop_path(DESIGN_ROOT))
         cls.bridge = load_module("integration_higgsfield_bridge", BRIDGE_ROOT / "scripts/higgsfield_job.py")
         cls.image_recipe = json.loads((CONTRACT_ROOT / "v1/fixtures/garden-recipe.image.valid.json").read_text(encoding="utf-8"))
         cls.design_recipe = json.loads((CONTRACT_ROOT / "v1/fixtures/garden-recipe.design.valid.json").read_text(encoding="utf-8"))
@@ -82,7 +100,6 @@ class AdapterMasterIntegrationTests(unittest.TestCase):
             self.image_recipe,
             reference_id=self.image_recipe["source"]["reference_id"],
             lane="photo_editorial",
-            executor_handoff=True,
             now=__import__("datetime").datetime(2026, 7, 11, tzinfo=__import__("datetime").timezone.utc),
         )
         self.assertEqual(self.image_recipe, handoff.get("garden_recipe"))
@@ -108,26 +125,35 @@ class AdapterMasterIntegrationTests(unittest.TestCase):
     def test_feedback_is_explicit_scoped_and_proposal_only(self) -> None:
         module = self.image_loop
         now = __import__("datetime").datetime(2026, 7, 11, tzinfo=__import__("datetime").timezone.utc)
-        event = module.build_feedback_event(
+        event = module.build_source_feedback(
             reference_id=self.image_recipe["source"]["reference_id"],
-            lane="photo_editorial",
-            decision="correction",
-            correction="reduce grain",
+            analysis_id=self.image_recipe["source"]["reference_id"],
+            scope="image_reference",
+            decision="accept_evidence",
+            reason_codes=["evidence_confirmed"],
+            field_pointers=[],
             now=now,
         )
-        self.assertEqual("correction", event["evaluation"]["decision"])
-        self.assertEqual([{
+        self.assertEqual("accept_evidence", event["decision"])
+        candidates = module.feedback_candidates([event], lane="image_reference")
+        self.assertEqual(1, len(candidates))
+        self.assertEqual({
+            "feedback_id": event["feedback_id"],
             "reference_id": self.image_recipe["source"]["reference_id"],
-            "decision": "correction",
-            "correction": "reduce grain",
-            "status": "proposal_only",
-        }], module.feedback_candidates([event], lane="photo_editorial"))
-        with self.assertRaisesRegex(ValueError, "feedback_privacy_violation"):
-            module.build_feedback_event(
+            "analysis_id": self.image_recipe["source"]["reference_id"],
+            "decision": "accept_evidence",
+            "reason_codes": ["evidence_confirmed"],
+            "field_pointers": [],
+            "status": "source_fact_only",
+        }, candidates[0])
+        with self.assertRaisesRegex(ValueError, "path_or_url_forbidden"):
+            module.build_source_feedback(
                 reference_id=self.image_recipe["source"]["reference_id"],
-                lane="photo_editorial",
-                decision="correction",
-                correction="open /Users/private/original.jpg",
+                analysis_id="/Users/private/original.jpg",
+                scope="image_reference",
+                decision="accept_evidence",
+                reason_codes=["evidence_confirmed"],
+                field_pointers=[],
                 now=now,
             )
 

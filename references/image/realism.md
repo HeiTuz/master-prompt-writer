@@ -20,7 +20,7 @@ compiler.md 발전표(피부·조명·필름 3행)와 **상보** — 그 3행은
 | 균일·무방향 조명 | 광원 방향·비율 미지정 | 단일 key 방향 1개(`soft light from camera left`) + `key:fill 1:2` + 그림자 거동(정본 editorial/photo-vocab.md §7.2·editorial/scene-craft.md §10) | 공통 |
 | 물리 불가 그림자·반사·캐치라이트 | 그림자·반사·catchlight 방향이 광원과 불일치, 다중 그림자·부유 | 그림자·specular·catchlight 방향=key 1개로 고정, `contact/grounding shadow` 명시, 반사 내용=주변 지오메트리 일치 | 공통. 배경합성은 §4 |
 | 과포화·HDR·글로시 AI 룩 | 채도·로컬 대비 과다, 광고식 과선명 | `muted/desaturated`(글로벌 −8~−12), `gentle highlight roll-off, lifted blacks`, 필름 룩 병기. 다큐 레지스터면 `raw photo, taken on a real camera, available light, unposed feel, mundane environment`로 낮춤(시네마틱 키아트 목적이면 유지) | gpt-image-2 HEX+켈빈 억제 / Higgsfield 저채도·필름 프리셋. 레지스터 토큰 개별 효능 (미검증) |
-| 비현실적 완벽 대칭·정돈 | 대칭 얼굴·정중 구도·stock pose | `natural facial asymmetry, uneven catchlights`, off-center `rule of thirds`, `candid/unposed, in-between moment`, 한쪽에만 잔머리 | gpt-image-2 긍정형 토큰 / Higgsfield Soul ID는 실사 학습이 대칭 완화 — 훈련이 담당(정본 lanes.md §Higgsfield 레인) |
+| 비현실적 완벽 대칭·정돈 | 대칭 얼굴·정중 구도·stock pose | `natural facial asymmetry, uneven catchlights`, off-center `rule of thirds`, `candid/unposed, in-between moment`, 한쪽에만 잔머리 | 텍스트·구조 레인은 긍정형 토큰 / Soul ID는 실사 학습이 대칭 완화 — 훈련이 담당(정본 lanes.md §인물·사실감 이미지 레인) |
 | 배경 인물·소품 붕괴 | 배경 군중·텍스트 세밀 지정 | 배경 인물=`distant motion-blur silhouettes, no identifiable faces`, 소품 수 축소+거리 m, 간판=`abstract light shapes, no readable text`, 배경=`follows perspective, consistent vanishing point`(전부 긍정형 재서술) | 공통 |
 | 렌즈 물리 부재 | 심도·왜곡·플레어·압축이 초점거리와 불일치 | 한 컷 한 렌즈 character 통일: 얕은 심도면 배경 일관 blur+보케, 광각이면 `mild edge stretch`, 망원이면 `compressed perspective, flattened planes`, 플레어·비네트는 광원 방향 일치(정본 editorial/photo-vocab.md §7.1) | 공통. 바디명 대신 결과·mm character(철칙 4, 세컨드 패스도 바디명 저신뢰로 수렴) |
 | 재질 광택 획일화 | 모든 소재 같은 광택·micro texture 부재 | 소재별 빛 반응 차등(정본 editorial/scene-craft.md §9): 레더 hard highlight 단절 / 스웨이드 흡수 / 실크 흐르는 하이라이트 / 유리 `fingerprints, soft reflection` / 금속 `anisotropic highlights` | 공통. 제품·실내 컷에 특히 |
@@ -57,7 +57,7 @@ compiler.md 발전표(피부·조명·필름 3행)와 **상보** — 그 3행은
 - [ ] **불완전성 토큰 ≥1** — §2 풀에서, 레인 권장 N개
 - [ ] **안티-AI 긍정형 앵커 1개** — 피부 결 또는 재질 결 토큰. **네거티브 아님**(Tier-0 유지). 배경합성만 COMPOSITE 연산 금지 계약이 네거티브형 담당
 
-**Higgsfield 예외:** 프리셋 1개 지정이 광원·렌즈 character 요건을 대체(정본 lanes.md §Higgsfield 레인). 불완전성·안티-AI 앵커는 본문 유지. 레인 게이트 카드가 이 게이트를 가리킨다.
+**인물·사실감 레인 예외:** 엔진 프리셋(영상 경로의 `preset_id`, 또는 웹 UI 스타일 프리셋)을 실제로 쓴 경우 그 프리셋이 광원·렌즈 character 요건을 대체한다(정본 lanes.md §인물·사실감 이미지 레인). 프리셋을 안 쓰는 스틸에는 면제가 적용되지 않는다. 불완전성·안티-AI 앵커는 어느 쪽이든 본문 유지.
 
 ## 4. 배경합성 정합 — 5축 + 통합 증분
 
@@ -71,7 +71,7 @@ compiler.md 발전표(피부·조명·필름 3행)와 **상보** — 그 3행은
 ## 5. 엔진별 실사 레버 (검증 스탬프 주의 — AGENTS.md)
 
 - **gpt-image-2:** 수치 레버(HEX·켈빈·`key:fill`)로 과포화·평면성 억제. 처방 긍정형(철칙 2, 네거티브 렌더 경향 compiler §2·(2026-07 실측)).
-- **Higgsfield:** 프리셋이 조명·카메라 실사 흡수(정본 lanes.md §Higgsfield 레인, (2026-07 실측)); 본문은 피사체·불완전성·팔레트 보강만. 프리셋별 세부 실사 메커니즘 (미검증) — 단정 금지.
+- **인물·사실감 레인:** 프리셋을 쓴 경우 프리셋이 조명·카메라 실사를 흡수((2026-07 실측)); 본문은 피사체·불완전성·팔레트 보강만. 프리셋 없이 가는 스틸은 광원·렌즈 결과를 본문에 남긴다. 프리셋별 세부 실사 메커니즘 (미검증) — 단정 금지. 정본 lanes.md §인물·사실감 이미지 레인.
 - **COMPOSITE:** 실사=통합 문제. §4 5축+증분 + 재조명 다이얼 필수. 네거티브형(연산 금지 계약)이 정당한 유일 스틸 레인.
 
 ## 6. 영상 실사 증분

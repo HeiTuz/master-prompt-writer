@@ -30,6 +30,7 @@ from datetime import date
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 FILES = ["SKILL.md", "references/templates.md", "references/model-playbooks.md", "references/adapters.md",
+         "references/prompt-graph.md", "references/image/surfaces.md", "references/image/model-routing.md",
          "references/image/lanes.md", "references/image/compiler.md", "references/image/categories.md",
          "references/image/editorial-fashion.md", "references/image/editorial/format-b.md",
          "references/image/editorial/tier2-safety.md", "references/image/editorial/taxonomy-dna.md",

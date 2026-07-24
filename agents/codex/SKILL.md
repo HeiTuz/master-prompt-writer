@@ -1,15 +1,15 @@
 ---
 name: MPW
-description: "프롬프트 작성·퇴고·라우팅 전용 통합 스킬 — '프롬프트 만들어줘/다듬어줘/검토해줘' 류 요청에 발동. 소관: 자율 goal 루프 지시문, 팀·멀티에이전트 작업지시 프롬프트, 시스템 프롬프트·자동화 잡, 직무 업무 프롬프트, 모델 튜닝·퇴고, UI/디자인 프롬프트, 이미지·배경합성·영상 프롬프트(gpt-image-2·Higgsfield/힉스필드) 정밀 컴파일. 산출 프롬프트는 붙여넣기 블록당 2000자 이내 실측, 이미지 계열은 경로 참조 없는 자기완결. 이미지·디자인 레퍼런스 분석 결과를 생성 프롬프트로 컴파일하며, 런타임별 호출 문법은 references/adapters.md를 따른다. 프롬프트 산출 없이 실제 코드 실행·이미지 생성·문서 조판만 원하는 요청은 이 스킬이 아니라 해당 실행 경로 소관."
-version: 2.14.0
+description: "프롬프트 작성·퇴고·라우팅 전용 통합 스킬 — '프롬프트 만들어줘/다듬어줘/검토해줘' 류 요청에 발동. 소관: 자율 goal 루프 지시문, 팀·멀티에이전트 작업지시 프롬프트, 시스템 프롬프트·자동화 잡, 직무 업무 프롬프트, 모델 튜닝·퇴고, UI/디자인 프롬프트, 이미지·배경합성·영상 프롬프트 정밀 컴파일. 문장을 쓰기 전에 의존 순서·축별 권한자·배제 관계를 그래프로 세운 뒤 조립한다(references/prompt-graph.md). 길이·비율·해상도는 보편 상수가 아니라 실행 표면의 속성으로 다룬다 — 기계 계약(스키마) / 플랫폼 파라미터(모델 id·resolution·duration 등 레버) / 붙여넣기 UI(블록당 2000자 실측)를 references/image/surfaces.md에서 먼저 판정하고, 이미지·영상 모델 선택은 references/image/model-routing.md의 목적축 표를 따른다. 실행자가 파라미터를 갖는 축은 산문에 중복 기술하지 않는다. 이미지·디자인 레퍼런스 분석 결과를 생성 프롬프트로 컴파일하며, 런타임별 호출 문법은 references/adapters.md를 따른다. 프롬프트 산출 없이 실제 코드 실행·이미지 생성·문서 조판만 원하는 요청은 이 스킬이 아니라 해당 실행 경로 소관."
+version: 2.15.0
 license: MIT
 metadata:
   category: prompt-writing
   locale: ko-KR
-  doctrine: unified-delegation-contract
+  doctrine: graph-first-delegation-contract
   host_surface: codex
-  canonical_source: "HeiTuz/MPW SKILL.md v2.14.0"
-  updated_at: "2026-07-20"
+  canonical_source: "HeiTuz/MPW SKILL.md v2.15.0"
+  updated_at: "2026-07-25"
   model_claims_reviewed_at: "2026-07-07"
   role_routing_reviewed_at: "2026-07-10"
 ---
@@ -23,23 +23,28 @@ metadata:
 
 프롬프트는 지시문이 아니라 **위임 계약**이다. 실행자는 결과·경계·검증을 기준으로 자율적으로 일한다. 이 스킬은 단일 진입점이며 런타임별 호출 문법은 [references/adapters.md](references/adapters.md)를 따른다.
 
-**출력 원칙**: 결론과 판정 기준을 먼저 둔다. 고정 양식을 채우지 말고 필요한 슬롯만 [references/templates.md](references/templates.md)의 조립 규칙으로 선택한다. 평문이 더 명확하면 구조화하지 않으며, 가독성이 인위적 압축보다 우선한다.
+**조립 원칙**: 문장을 쓰기 전에 **구조를 먼저 세운다** — 의존 순서, 축별 권한자, 배제 관계. 정본은 [references/prompt-graph.md](references/prompt-graph.md)다. 프롬프트가 재현되지 않는 실패는 대부분 문장 품질이 아니라 이 구조의 결함이다.
 
-**references 접근**: 범용 골격·예시·모호어·보강은 [references/templates.md](references/templates.md), 역할·권한·모델 적응은 [references/model-playbooks.md](references/model-playbooks.md)를 읽는다. IMAGE 계열 규칙은 [references/image/lanes.md](references/image/lanes.md)에서 시작한다.
+**출력 원칙**: 결론과 판정 기준을 먼저 둔다. 고정 양식을 채우지 말고 필요한 슬롯만 [references/templates.md](references/templates.md)의 조립 규칙으로 선택한다. 평문이 더 명확하면 구조화하지 않으며, 가독성이 인위적 압축보다 우선한다. **그래프는 조립 도구이지 납품물이 아니다** — 사용자에게 나가는 것은 완성된 프롬프트 블록뿐이다.
+
+**references 접근**: 구조·권한·체인은 [references/prompt-graph.md](references/prompt-graph.md), 범용 골격·예시·모호어·보강은 [references/templates.md](references/templates.md), 역할·권한·모델 적응은 [references/model-playbooks.md](references/model-playbooks.md)를 읽는다. IMAGE 계열은 **표면 판정 [references/image/surfaces.md](references/image/surfaces.md) → 모델 선택 [references/image/model-routing.md](references/image/model-routing.md) → 레인 규칙 [references/image/lanes.md](references/image/lanes.md)** 순이다.
 
 ## 3층 설계 모델
 
 | 층 | 내용 | 실패 시 증상 |
 |---|---|---|
 | ① 계약층 | 결과 명세·DoD·자율성·하드라인·검증·에스컬레이션 | 완료 주장만 있고 판정 불가, 사고성 행동 |
-| ② 구조층 | 필요한 슬롯과 채워진 예시, 난이도 밀도 | 산출물이 얕거나 형식이 흔들림 |
-| ③ 표면층 | 대상 문법·배치·길이 | 특정 환경에서만 이상 동작, 잘림 |
+| ② 구조층 | 의존 순서·축별 권한자·필요한 슬롯과 채워진 예시 | 산출물이 얕거나, 같은 프롬프트가 매번 다르게 나옴 |
+| ③ 표면층 | 대상 문법·파라미터·배치·길이 | 특정 환경에서만 이상 동작, 잘림, 존재하지 않는 값 요구 |
 
-## 길이 계약 — 2000자 하드라인
+## 길이 계약 — 표면이 정한다
 
-1. 붙여넣기 블록은 공백 포함 2000자 이내다. 내보내기 전 문자 수를 실측한다(`wc -m` 등) — 어림짐작 금지, `길이:` 노트에는 실측값만 쓴다. 다중 컷·다중 goal은 블록별로 재고 별도 메시지로 전달한다.
-2. 초과 블록은 그대로 내보내지 않는다. 장식 → 중복 → 방법 설명 순으로 줄이고, 그래도 넘으면 같은 파일시스템에서만 `/tmp/prompt-handoffs/<slug>.md`에 실제 저장한 상세 경로 한 줄을 붙인다. 원격 수신자에는 감량해 자기완결로 만든다.
-3. IMAGE 계열 규칙은 [references/image/lanes.md](references/image/lanes.md)를 따른다.
+**길이는 보편 상수가 아니라 표면의 속성이다.** 표면 판정과 표면별 예산의 정본은 [references/image/surfaces.md](references/image/surfaces.md)이며, 텍스트 프롬프트에도 같은 판정을 쓴다.
+
+1. **붙여넣기 표면(S3)** — 사람이 입력창에 직접 넣는 경우 블록당 공백 포함 2000자가 하드라인이다. 내보내기 전 문자 수를 실측한다(`wc -m` 등) — 어림짐작 금지, `길이:` 노트에는 실측값만 쓴다. 다중 컷·다중 goal은 블록별로 재고 별도 메시지로 전달한다.
+2. **기계 계약 표면(S1)** — 스키마 필드 제약이 하드라인이다. `contracts/v1/prompt-bundle.schema.json` 경로의 블록도 2000자 상한을 계약으로 갖는다.
+3. **플랫폼 파라미터 표면(S2)** — 계약 상한이 없다. 대신 신호 밀도 규칙을 쓴다: 파라미터로 되는 축을 산문에 중복하지 않고, 장식·반복·방법 설명을 넣지 않는다. 모델이 상한을 공개하면 그것이 하드라인이다. **자동으로 잘라내지 않는다** — 넘치면 줄이거나 컷을 분리하고, 무엇을 뺐는지 알린다.
+4. 초과 블록은 그대로 내보내지 않는다. 장식 → 중복 → 방법 설명 순으로 줄이고, 그래도 넘으면 같은 파일시스템에서만 `/tmp/prompt-handoffs/<slug>.md`에 실제 저장한 상세 경로 한 줄을 붙인다. 원격 수신자에는 감량해 자기완결로 만든다.
 
 ## 모드 라우팅
 
@@ -50,13 +55,13 @@ metadata:
 | 단일 작업지시·시스템 프롬프트·자동화 잡 | **CONTRACT** |
 | 직무 실무 산출물 | **BUSINESS** |
 | 모델 적응, 퇴고, 리서치, 추출 | **MODEL** |
-| 이미지·영상 생성 | **IMAGE** → [references/image/lanes.md](references/image/lanes.md) |
-| 피사체 보존 배경 교체 | **COMPOSITE** → [references/image/lanes.md](references/image/lanes.md) |
+| 이미지·영상 생성 | **IMAGE** → [surfaces.md](references/image/surfaces.md) → [model-routing.md](references/image/model-routing.md) → [lanes.md](references/image/lanes.md) |
+| 피사체 보존 배경 교체 | **COMPOSITE** → 같은 순서 |
 | UI·페이지·컴포넌트 제작 | 실행 모드 + **DESIGN** 오버레이 |
 | 직전 프롬프트의 지정 축만 수정 | **MODEL-델타** |
-| A의 산출이 B의 입력 | 단계별 모드 + 체인 인터페이스 계약 |
+| A의 산출이 B의 입력 | 단계별 모드 + `feeds` 인터페이스 계약 ([prompt-graph.md](references/prompt-graph.md) §5) |
 
-Tie-break: 자율 루프는 GOAL을 우선한다. 완성 문서 조판은 문서 도구 소관이고, 순수 실행 요청은 실행 경로 소관이다. 혼합 요청은 산출물별 블록으로 분리한다. IMAGE 상세 분기·게이트는 [references/image/lanes.md](references/image/lanes.md)로 압축한다. 결과 자체가 모호하면 요구 구체화 또는 질문 ≤3만 사용한다.
+Tie-break: 자율 루프는 GOAL을 우선한다. 완성 문서 조판은 문서 도구 소관이고, 순수 실행 요청은 실행 경로 소관이다. 혼합 요청은 산출물별 블록으로 분리한다. 결과 자체가 모호하면 요구 구체화 또는 질문 ≤3만 사용한다.
 
 ## 역할·권한 라우팅
 
@@ -79,7 +84,7 @@ Tie-break: 자율 루프는 GOAL을 우선한다. 완성 문서 조판은 문서
 
 **게이트 필요성 테스트** — 금지를 넣기 전 ① 실행자에게 실제로 열려 있는가 ② 환경의 승인 훅·권한이 이미 막지 않는가 ③ 이 범위에서 실제로 발생 가능한가를 확인한다. 하나라도 아니오면 노이즈다. 통과한 공개 발신, 자격증명·계정·결제, 비가역 파괴, 프로덕션 행동만 구체적 게이트 후보이며, 허용된 로컬 작업에는 차단 대신 백업·dry-run·diff를 요구한다.
 
-## 공통 코어 10규칙
+## 공통 코어 12규칙
 
 1. 결과는 활동이 아니라 끝난 상태로 쓴다.
 2. 게으른 완료 보고가 통과하지 않게 경로·명령·개수·링크 증거로 DoD를 조인다.
@@ -87,10 +92,12 @@ Tie-break: 자율 루프는 GOAL을 우선한다. 완성 문서 조판은 문서
 4. 검증은 실행자의 완료 전 의무다.
 5. 막힘 기준·시도 범위·보고 형식을 쓴다. blocked도 유효 종료다.
 6. 모호어는 [templates.md](references/templates.md)의 치환표로 바꾸고 모순은 우선순위 한 줄로 푼다.
-7. 긴 자료는 경로 참조를 우선하고 답을 바꾸는 사실만 남긴다. IMAGE 계열은 [lanes.md](references/image/lanes.md)를 따른다.
+7. 긴 자료는 경로 참조를 우선하고 답을 바꾸는 사실만 남긴다. IMAGE 계열은 표면 판정([surfaces.md](references/image/surfaces.md))을 먼저 따른다.
 8. 최우선 지시는 앞과 뒤에 두고 벌크 자료는 중간에 둔다.
 9. 비자명·비표준 형식에는 채워진 예시를 하나 둔다.
 10. 빈칸은 대화·증거·저위험 기본값으로 채우고, 결과·하드라인을 바꾸는 추론 불가 슬롯만 질문한다.
+11. **한 축에 권한자는 하나다.** 같은 것을 정하는 지시가 둘이면 하나를 지운다([prompt-graph.md](references/prompt-graph.md) §4).
+12. **실행자가 파라미터를 갖는 축은 산문에 쓰지 않는다.** 비율·해상도·품질·길이·오디오·팔레트는 레버가 있으면 레버로 넘긴다.
 
 ## 모드별 압축 안내
 
@@ -101,10 +108,13 @@ GOAL·TEAM·CONTRACT·BUSINESS·MODEL·리서치·추출의 필수 코어와 조
 - [ ] 결과가 상태이고 완료 기준이 판정 가능한가
 - [ ] 필요한 계약 요소만 남겼고 빈 슬롯은 출력하지 않았는가
 - [ ] 모호어·제약 모순·이중 게이트가 없는가
+- [ ] **축마다 권한자가 하나인가** — 같은 것을 정하는 지시가 둘 이상 없는가
+- [ ] **고아 증거가 없는가** — 넣은 레퍼런스·자료가 실제로 어떤 슬롯을 잠그는가
 - [ ] 형식이 비자명·비표준이면 채워진 예시가 있는가
-- [ ] 블록당 2000자 이내이며 초과 처리 계약을 지켰는가
+- [ ] 표면을 판정했고 그 표면의 길이·파라미터 계약을 지켰는가(S3면 블록당 2000자 실측)
+- [ ] 실행자 파라미터로 되는 축이 산문에 중복되지 않았는가
 - [ ] 검증·blocked 규칙과 언어 매칭이 있는가
-- [ ] IMAGE 계열: [lanes.md](references/image/lanes.md) 게이트 카드 통과
+- [ ] IMAGE 계열: [surfaces.md](references/image/surfaces.md) 표면 체크 + [lanes.md](references/image/lanes.md) 게이트 카드 통과
 
 ## Output format
 
