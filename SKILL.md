@@ -1,7 +1,7 @@
 ---
 name: MPW
 description: "프롬프트 작성·퇴고·라우팅 전용 통합 스킬 — '프롬프트 만들어줘/다듬어줘/검토해줘' 류 요청에 발동. 소관: 자율 goal 루프 지시문, 팀·멀티에이전트 작업지시 프롬프트, 시스템 프롬프트·자동화 잡, 직무 업무 프롬프트, 모델 튜닝·퇴고, UI/디자인 프롬프트, 이미지·배경합성·영상 프롬프트 정밀 컴파일. 문장을 쓰기 전에 의존 순서·축별 권한자·배제 관계를 그래프로 세운 뒤 조립한다(references/prompt-graph.md). 길이·비율·해상도는 보편 상수가 아니라 실행 표면의 속성으로 다룬다 — 전달 채널 / 타깃 엔진 / 기계 계약 중 가장 좁은 상한이 구속하며(전역 2000자 하드라인은 없고 미드저니는 문자가 아니라 단어 수로 잰다) references/image/surfaces.md에서 먼저 판정하고, 이미지·영상 모델 선택은 references/image/model-routing.md의 목적축 표를 따른다. 실행자가 파라미터를 갖는 축은 산문에 중복 기술하지 않는다. 이미지·디자인 레퍼런스 분석 결과를 생성 프롬프트로 컴파일하며, 런타임별 호출 문법은 references/adapters.md를 따른다. 프롬프트 산출 없이 실제 코드 실행·이미지 생성·문서 조판만 원하는 요청은 이 스킬이 아니라 해당 실행 경로 소관."
-version: 2.15.2
+version: 2.16.0
 license: MIT
 metadata:
   category: prompt-writing
@@ -101,7 +101,7 @@ Tie-break: 자율 루프는 GOAL을 우선한다. 완성 문서 조판은 문서
 
 ## 모드별 압축 안내
 
-GOAL·TEAM·CONTRACT·BUSINESS·MODEL·리서치·추출의 필수 코어와 조건부 확장은 [references/templates.md](references/templates.md)가 정본이다. 안티패턴·워크플로우·후속 보강도 그 파일의 상세를 따른다. Midjourney는 버전 호환·파라미터·`--no`·무드보드·길이 단위가 [references/midjourney-v81-identity.md](references/midjourney-v81-identity.md)에 있고, 캐릭터 시트 산문 규칙만 [references/midjourney-character-sheets.md](references/midjourney-character-sheets.md)에 있다. 엔진 문법이 필요하면 전자부터 읽는다.
+GOAL·TEAM·CONTRACT·BUSINESS·MODEL·리서치·추출의 필수 코어와 조건부 확장은 [references/templates.md](references/templates.md)가 정본이다. 안티패턴·워크플로우·후속 보강도 그 파일의 상세를 따른다. Midjourney는 버전 호환·파라미터·`--no`·무드보드·길이 단위가 [references/midjourney-identity.md](references/midjourney-identity.md)에 있고, 캐릭터 시트 산문 규칙만 [references/midjourney-character-sheets.md](references/midjourney-character-sheets.md)에 있다. 엔진 문법이 필요하면 전자부터 읽는다.
 
 ## 출력 게이트
 

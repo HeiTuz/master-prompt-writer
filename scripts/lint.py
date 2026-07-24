@@ -38,7 +38,7 @@ FILES = ["SKILL.md", "references/image/from-image.md", "references/templates.md"
          "references/image/editorial/concept-collision.md", "references/image/look-and-concept.md",
          "references/image/typography.md", "references/image/production.md",
          "references/image/realism.md", "references/midjourney-character-sheets.md",
-         "references/midjourney-v81-identity.md"]
+         "references/midjourney-identity.md"]
 SSOT = "references/image/editorial/tier2-safety.md"   # Tier-2 동결 문자열 정본 (§2 코드블록)
 COMPILER = "references/image/compiler.md"
 VALIDATOR = ROOT / "scripts" / "check_prompt.mjs"
