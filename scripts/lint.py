@@ -45,6 +45,7 @@ VALIDATOR = ROOT / "scripts" / "check_prompt.mjs"
 # 라벨 3+1포맷: "N자 실측"(괄호형 포함) / "실측: N자" / bare "(…, N자)" — "블록당 N자"(규칙 문구)와
 # "제3자" 같은 비라벨은 제외. bare 포맷은 실길이 라벨만 대상(N >= 50).
 LABEL_PATTERNS = [r"(?<!블록당 )(?<!\d)(\d+)자 실측", r"실측:\s*(\d+)자", r"(?<!제)(?<!\d)(\d+)자\)"]
+STAMP_FUTURE_SKEW_DAYS = 1  # author-local vs CI-UTC date skew
 BARE_PATTERN_MIN = 50
 BIND_WINDOW = 200  # 라벨-코드블록 펜스 간 인접 판정 거리(문자)
 MEASUREMENT_STAMP_PATTERN = re.compile(r"\((\d{4})-(\d{2}) 실측[^)\n]*\)")
@@ -124,7 +125,10 @@ def check_review_stamps(metadata, errors, today):
         except ValueError:
             errors.append(f"frontmatter: {field} must be a valid YYYY-MM-DD date")
             continue
-        if reviewed_at > today:
+        # Stamps are written in the author's local timezone; CI ages them in UTC,
+        # so a stamp written today can read one day ahead. Tolerate exactly that.
+        # A real typo (a year out) is hundreds of days ahead and still caught.
+        if (reviewed_at - today).days > STAMP_FUTURE_SKEW_DAYS:
             errors.append(f"frontmatter: {field} {value} violates — future-dated review stamp")
         elif reviewed_at < cutoff:
             errors.append(f"frontmatter: {field} {value} violates the 6-month re-verification rule (AGENTS.md hardline 4)")

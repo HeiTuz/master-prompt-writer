@@ -33,9 +33,15 @@ class ReviewStampTests(unittest.TestCase):
         self.assertEqual(self.check("2026-08-31"), [])
         self.assertEqual(self.check("2026-02-28"), [])
 
+    def test_one_day_ahead_is_timezone_skew_not_a_typo(self):
+        # An author east of UTC stamps their local date; CI ages it in UTC and
+        # reads it one day ahead. Exactly one day is tolerated, two is not.
+        self.assertEqual(self.check("2026-09-01"), [])
+        self.assertIn("future-dated review stamp", self.check("2026-09-02")[0])
+
     def test_stale_future_invalid_and_date_object(self):
         self.assertIn("6-month re-verification", self.check("2026-02-27")[0])
-        self.assertIn("future-dated review stamp", self.check("2026-09-01")[0])
+        self.assertIn("future-dated review stamp", self.check("2026-09-02")[0])
         self.assertIn("must be a YYYY-MM-DD string", self.check("invalid")[0])
         self.assertEqual(self.check(date(2026, 8, 31)), [])
 
