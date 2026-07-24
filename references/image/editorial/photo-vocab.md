@@ -6,31 +6,68 @@
 
 판정문: gpt-image-2에는 카메라·조명 장비명을 그대로 박지 말고 **결과(빛·심도·질감·색)**로 환원해서 쓴다. 표현은 긍정형 기본 + 티어 화이트리스트다. 장면 배제 부정문은 0개, `no ~`는 Tier-1/Tier-2 캐노니컬 문구로만 쓴다. SD 품질태그·가중치 문법은 쓰지 않는다.
 
-### 7.1 심도·렌즈 character (결과로)
+### 7.1 심도·렌즈 character·카메라 높이 (결과로)
+
+원근 왜곡을 만드는 건 초점거리가 아니라 **카메라–피사체 거리**다. 그래서 `85mm`보다 "카메라가 멀고 얼굴 평면이 눌렸다"는 결과가 인과적으로 정확하고, 장비명을 학습하지 않은 모델에도 전달된다. 철칙 4의 물리적 근거다.
 
 | 축 | 결과 토큰 |
 |---|---|
-| 광각 느낌 | `wide field of view, environment fully visible, mild edge stretch, deep focus front-to-back` |
-| 표준 | `natural perspective, balanced compression, subject and setting in proportion` |
-| 망원/압축 | `distant camera position, compressed perspective, flattened planes, subject lifted from a soft background` |
-| 얕은 심도 | `shallow depth of field, background falls off softly into creamy blur` |
+| 광각 느낌 | `camera close to the subject, near features enlarged relative to far ones, wide field of view, mild edge stretch, deep focus front-to-back` |
+| 표준 | `natural perspective, proportions as the eye reads them, subject and setting in proportion` |
+| 중망원(인물 기본) | `camera stepped back, facial planes holding flattering proportion, background pushed back and softened` |
+| 망원/압축 | `distant camera position, compressed perspective, flattened planes, subject lifted from a soft background`. 더 밀면 `background collapsed into a flat plane directly behind the subject` |
+| 얕은 심도 | `shallow depth of field, eyes sharp with the shoulder line already falling off, background dissolved into creamy blur` |
+| 깊은 심도(룩북) | `garment surface sharp from collar to hem, fabric weave resolvable, background separated by luminance step, not by defocus`(블러 대신 톤 차이로 분리해야 옷의 정보가 남는다) |
 | 빈티지 보케 | `swirly painterly bokeh, gentle vintage rendering` |
 | 아나모픽 | `wide cinematic frame, horizontal flares, oval highlights` |
 | 가장자리 감쇠 | `sharp central microtexture, soft edge focus falloff`(중심부 미세결은 선명, 프레임 가장자리만 점진적으로 풀림) |
 
-### 7.2 조명 (방향·질·결과)
+**카메라 높이**가 전신 비율의 실제 지배 변수다. 앵글(§7.5)과 겹치지 않는 별개 축으로 명시한다.
 
 | 축 | 결과 토큰 |
 |---|---|
-| 패턴 | Rembrandt(뺨 삼각 하이라이트) / butterfly(코밑 나비 그림자) / split(반쪽광) / clamshell(위아래 부드러운 균등광) |
-| 질 | `soft diffuse wraparound light, gentle gradient shadows` ↔ `hard directional light, crisp sharp-edged shadows`. 중간 단계 레이킹 = `low-angle soft light, gentle relief shadows`(낮은 측면의 넓은 연질광이 돌출부만 밝히고 홈·굴곡엔 완만한 그림자) |
-| 비율 | `key:fill 1:1`(평탄) / `1:2`(자연) / `1:3`(드라마틱). 결과로 `moderate shadow contrast` 식 병기 |
-| 보조 | `cool rim light separating the edge`, `warm practical glow`, `window light from camera left`, `rectangular catchlight, iris radial texture, aligned with key direction`(눈동자 안 사각 반사가 클로즈업에 실촬영 공간감을 만듦) |
-| 시간광 | golden hour 따뜻한 저각광 / blue hour 차분한 한기 / 정오 톱라이트 |
+| 전신 표준 | `camera at the subject's waist-to-chest height, leg length rendered true, hip-to-hem line reading full`. 눈높이에서 내려보면 `lower body foreshortened, legs reading shorter`가 되므로 룩북에선 회피 |
+| 로우앵글 | `camera below waist height looking up, subject monumental, hemline dominant, ceiling or sky entering the frame` |
+| 상반신·뷰티 | `camera at the subject's eye height, facial verticals staying parallel` |
+
+### 7.2 조명 (방향·질·결과)
+
+**클램셸이 패션 에디토리얼·뷰티의 기본 셋업**이고, 지시가 없으면 여기서 출발한다. 광질을 가르는 건 장비가 아니라 **피사체에서 본 광원의 겉보기 크기**다 — 크고 가까우면 소프트, 작고 멀면 하드다.
+
+| 축 | 결과 토큰 |
+|---|---|
+| 패턴 — clamshell | `light from above angled down and a second source from below angled up, shadows under the eyes and jaw filled in, skin glowing evenly, twin catchlights stacked in each eye` |
+| 패턴 — Rembrandt | `key from 45° above, triangle of light on the shadow-side cheek, eye on the shadow side still catching a highlight` |
+| 패턴 — butterfly·loop | `key placed high and directly in front, small symmetric shadow under the nose, cheekbones defined by even falloff` / 키를 축에서 살짝 돌리면 `nose shadow looping onto the cheek, mild asymmetry` |
+| 패턴 — split | `light striking one side of the face only, vertical division down the nose bridge, far side falling to near-black` |
+| 패턴 — 뷰티디시 키 | `crisper shadow edge than a softbox, clearly defined round catchlight, skin texture retaining micro-contrast` |
+| 질 — 소프트 | `soft diffuse key, shadow edge transitioning gradually, gentle gradient across the face`. 극단은 `very large source close to the subject, light wrapping continuously around the cheek` |
+| 질 — 중간 | `moderately defined shadow edge, form modelled with a soft terminus` |
+| 질 — 하드 | `small distant source, crisp shadow edge with a hard terminus, small bright specular highlight, texture strongly raked` |
+| 질 — 레이킹 | `low-angle soft light, gentle relief shadows`(낮은 측면의 넓은 연질광이 돌출부만 밝히고 홈·굴곡엔 완만한 그림자) |
+| 비율 | 표기는 **키측:그림자측**, 배수가 곧 스톱이다. `1:1` 평탄(0스톱) / `2:1` 자연·그림자 디테일 유지(1스톱) / `4:1` 드라마틱(2스톱) / `8:1` 로우키·암부 near-black(3스톱). 숫자 단독 금지 — `key:fill 4:1, pronounced shadow side, shadow detail thinning`처럼 결과와 병기한다(철칙 10) |
+| 룩북 기본광 | `large soft key with a broad white bounce filling the shadow side, low overall contrast, every shadow still holding the seam and the fold`(옷이 주인공이므로 폴리보드 필로 대비를 낮춘다) |
+| 보조 | `cool rim light separating the edge`, `warm practical glow`, `window light from camera left`, `bounce from below lifting the shadow under the jaw` |
+| 시간광 | golden hour 따뜻한 저각광 / blue hour 차분한 한기 / 정오 톱라이트 = `short dense nose shadow, shadowed eye sockets` |
 | 색온도 분리 | `split color-temperature lighting, warm key on skin, cool background wash`(인물이 앞으로 분리되고 공간 깊이가 생김) / 변주 `cool key on subject, warm tungsten practical background` |
 | 하이키 스튜디오 | `high-key white studio, large negative space, clean editorial margins`(순백 배경과 긴 여백이 인물·의상 실루엣을 선명하게 밀어 올림) |
 
+**캐치라이트 형태 = 모디파이어 형태의 각막 반사.** 클로즈업 리얼리즘의 가장 싼 레버다.
+
+| 소스 | 결과 토큰 |
+|---|---|
+| 옥타박스·뷰티디시 | `round soft-edged catchlight, one per eye` |
+| 사각 소프트박스 | `rectangular catchlight, iris radial texture, aligned with key direction` |
+| 스트립박스 | `tall narrow vertical catchlight` |
+| 링 | `ring-shaped annular catchlight surrounding the pupil` |
+| 클램셸 | `two stacked catchlights, larger above and fainter below` |
+| 격자 창 | `catchlight divided by the window mullion into panes` |
+| 흐린 하늘 | `broad diffuse catchlight filling the upper third of the iris` |
+| 직사 스피드라이트 | `tiny pinpoint specular catchlight, very bright` |
+
 ### 7.3 색·그레이딩 (HEX·켈빈·룩)
+
+**그레이딩은 스킨 외 영역에 걸고 스킨은 중립으로 남긴다**(휘도 마스크). teal & orange를 얼굴에 그대로 걸어 피부가 오렌지로 무너지는 게 가장 흔한 실패다.
 
 | 축 | 규칙 |
 |---|---|
@@ -38,6 +75,9 @@
 | 색온도 | 켈빈 또는 `warm 3200K-feel` / `neutral` / `cool` |
 | 조화 | complementary / analogous / triadic |
 | 룩 | teal & orange, bleach bypass(저채도 고대비), desaturated muted, warm filmic roll-off |
+| 스킨 보호 기본 | `warm grade applied to background and negative space, skin left neutral and true to its own undertone` |
+| 스킨 보호 — 저채도 | `desaturated overall palette with skin retaining natural warmth and blood tone` |
+| 스킨 보호 — 틸 섀도 | `teal shift confined to the shadows and the background, skin midtones untouched` |
 | 필름 결과 | Portra 룩 = `warm skin, soft pastel midtones, gentle highlight roll-off`; Tri-X = `high-contrast monochrome, visible grain`; CineStill 800T = `tungsten night palette, soft red halation around highlights` |
 
 ### 7.4 필름/매체 3파트
@@ -48,13 +88,7 @@
 
 예: `Kodak Portra 400 emulation — warm luminous skin, soft green-leaning shadows, creamy highlights. Editorial magazine roll-off.`
 
-조합 공식(감성 키워드는 필름/룩 이름과 병기해야 결과 차이가 선명해진다):
-
-```text
-[필름/룩 이름] + [빛의 방향] + [노출 방식] + [색감] + [그레인] + [분위기]
-```
-
-예: `Kodak Portra 400 film photography, soft window light from camera left, slightly overexposed highlights, warm creamy skin tones, fine film grain, low contrast, quiet romantic mood.`
+배치 순서는 철칙 10의 조합 공식을 따른다. 예: `Kodak Portra 400 film photography, soft window light from camera left, slightly overexposed highlights, warm creamy skin tones, fine film grain, low contrast, quiet romantic mood.`
 
 #### 필름 스톡 결과 사전 (단어 단독 금지 — 결과·장면과 병기)
 
@@ -103,7 +137,7 @@
 | 거리 | 카메라-피사체 거리를 m로 명시 |
 | 커버 크롭 | `upper-body fashion close-up, tilted head crop, clean cover portrait`(얼굴·주얼리·의상 일부만 크게 잘라 뷰티와 패션 정보를 동시에 압축) |
 | 커버 크롭 변주 | `gesture beauty crop`(손·주얼리가 얼굴 일부를 가림) / `asymmetric cover crop`(대각 축으로 밀어 비대칭) |
-| 풀블리드 매크로 | `full-frame surface macro, no container, texture as subject`(용기·배경을 지우고 표면 자체를 화면 가득 채워 질감이 주제가 됨) |
+| 풀블리드 매크로 | `full-frame surface macro, texture filling the frame edge to edge, the surface itself as subject`(용기·배경 없이 질감이 주제가 됨) |
 
 ### 7.6 재질·후처리 (결과)
 
@@ -117,7 +151,7 @@
 | 피부 — 꿀광 | `inner honey glow, warm luminous skin, subtle cheek highlight` |
 | 피부 — 부분 매트 | `matte T-zone, controlled forehead shine, balanced dewy finish` |
 | 피부 실패조건 짝 | `skin undertone preserved under split lighting` — §7.2 색온도 분리 조명에서 피부톤이 죽지 않게 병기 |
-| 로고·워터마크 의도 | `clean, brand-free, copy-free finish` |
+| 로고·워터마크 의도 | `clean, brand-free, copy-free finish` — 나머지 실패 축은 §7.9 |
 
 ### 7.7 장르 즉시조합
 
@@ -130,16 +164,45 @@
 | 제품 플랫레이 | clean top-down flatlay + even soft light + generous margins + single hero with subordinate props |
 | 한국 웹툰 | soft cel shading, glossy K-beauty finish, dewy highlights, vertical scroll |
 
+#### 룩북 감도 — 화보와 갈리는 축
+
+룩북의 목적은 명료성·정확성·일관성, 화보의 목적은 서사다. 룩북은 클린 배경·동일 앵글·균일 조명(화보는 로케이션이 곧 내용), 스타일링 절제로 구조·원단·디테일 보존(화보는 레이어링으로 긴장 생성), 전 컷 동일 셋업(화보는 컷마다 달라도 됨). 이커머스와 에디토리얼 사이에 선다. 브랜드 거명 대신 아래 형식 특성으로 쓴다.
+
+| 축 | 결과 토큰 |
+|---|---|
+| 의상 판독성 | `entire garment inside the frame with the hemline and both cuffs visible, seams and closures readable` |
+| 실루엣 우선 | `silhouette separated from the background along its full outline, arms held away from the torso so the side seam reads` |
+| 반복 프레이밍 | `identical camera height, distance and framing across every look, same key position, same pose repeated across colourways` |
+| 배경 중립성 | `plain seamless backdrop in one flat tone, backdrop value one step away from the garment` |
+| 로케이션 룩북 | `location reduced to a neutral architectural surface, signage kept out of frame` |
+| 바닥 그림자 | `soft contact shadow directly beneath the feet only` |
+| 표정·톤 일관성 | `neutral composed expression, gaze level to camera, same white balance and grade across the series` |
+| 컷 — 풀렝스 | `full-length frame head to foot with margin above the crown and below the shoes` |
+| 컷 — 3/4 | `three-quarter frame cut through the mid-thigh or the mid-calf, joints left intact` |
+| 컷 — 백뷰·디테일 | `back view showing the yoke, back seam and hem from behind` / `close crop on the cuff, neckline or hem as worn, weave and stitch density resolvable` |
+| 컷 — 무빙 | `walking mid-stride with fabric carrying momentum, one foot lifted` |
+| 컷 — 플랫레이·고스트 | `garment laid flat on a plain surface, symmetric and wrinkle-free` / `garment holding its worn volume with the body absent inside` |
+
 ### 7.8 국문/영문 혼용 규칙
 
-| 이기는 언어 | 영역 |
-|---|---|
-| **한국어 승** | 장면 서사 골격(누가·어디서·무엇을) · 무드 형용(아련한, 서늘한) · 문화 부하 명사(남성지풍, 청순, 물오른) · 렌더될 한글 카피 |
-| **영어 승** | 심도(shallow DoF, deep focus) · 조명(rim light, key:fill 1:2, clamshell) · 필름(Portra emulation, halation) · 포즈 술어(contrapposto, over-the-shoulder) · 티어 고정 문구(Tier-1/Tier-2 캐노니컬) · HEX 주변 기술 토큰(gradient, duotone) |
+정본은 [../compiler.md](../compiler.md) §7이다 — 장면 골격·무드·문화 부하 명사는 한국어, 기법 토큰(심도·조명·필름·포즈 술어)과 티어 고정 문구는 영어, 렌더 텍스트는 한 줄 한 언어. 이 파일의 어휘를 배치할 때 그 규칙을 따른다. 인물 신원은 고정 디테일로 쓰고, 실재 인물·상표 대신 가상 페르소나/브랜드를 쓴다.
 
-하이브리드 패턴 = 한국어 골격 문장에 영어 기법 토큰 삽입.
+### 7.9 실패 지점 → 긍정형 재서술
 
-1. `창가의 아침빛 아래 선 인물, soft window light from camera left, shallow DoF, 배경은 크림 #F7F4EC 단색.` — 한국어 골격 + 영어 조명/심도 토큰.
-2. 조명 서술은 `부드러운 실내 자연광과 약한 필라이트` vs `soft window light, gentle fill` 어느 쪽도 허용한다. 단, 한 문장의 골격 언어는 통일한다. 반쪽짜리 번역체 금지.
+철칙 2 Tier-0은 부정문 0개다. 패션에서 실제로 무너지는 **축**만 긍정형으로 되돌린다. 가운데 열은 대조용이며 프롬프트에 옮기지 않는다.
 
-렌더 텍스트는 한 줄 한 언어다. 한 따옴표 문자열 안 KO+EN 혼합 금지(`W-TEXT-MIXLANG`). 인물 신원은 고정 디테일로 쓴다. 실재 인물·상표 대신 가상 페르소나/브랜드를 쓴다.
+| 축 | 부정형(옮기지 않음) | 긍정형 재서술 |
+|---|---|---|
+| 손 기하 | extra fingers | `five separated fingers with natural knuckle articulation, one thumb per hand set apart` |
+| 손–의상 접촉 | hands merging into fabric | `fingertips flat on the outside of the pocket edge, the pocket opening reading as its own line` |
+| 손 회피(최저 리스크) | — | `hands relaxed behind the back` / `crop line above the wrists, hands entirely outside the frame` |
+| 봉제·구조 | melted seams | `seams running continuously from shoulder to hem, stitch line visible at cuff and side` |
+| 드레이프·두께 | impossible drape | `fabric falling with its own weight, folds originating at shoulder and waist, material thickness visible at hem and collar` |
+| 패턴 정합 | mismatched pattern | `stripe alignment continuous across the side seam, pattern scale identical on every panel` |
+| 의상 좌우 | asymmetric sleeves | `both sleeves ending at the same point on the wrist, placket straight down the centre front with evenly spaced buttons` |
+| 신발·액세서리 | floating feet, broken chain | `both shoes symmetric with even sole thickness, both soles in full contact with the ground, one continuous chain with uniform link size, earrings matching as a pair` |
+| 얼굴·눈 | deformed iris | `features symmetric about the vertical midline, both irises circular and equal in diameter, matching catchlight in each eye` |
+| 신체 계수·비례 | extra limbs | `two arms and two legs, each traceable to one shoulder or hip joint, proportion around seven and a half heads` |
+| 머리카락 경계 | melted hair | `hair strands separating cleanly against the background, flyaway strands at the crown` |
+| 브랜드·문자 | logos, background text | `solid unmarked fabric face, clean brand-free finish, background surfaces plain, signage kept out of frame` |
+| 장면 정합 | inconsistent shadows | `all cast shadows falling in the same direction from a single key camera left` |

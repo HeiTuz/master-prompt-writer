@@ -1,48 +1,152 @@
-# Midjourney v8.1 — identity-locked portrait and turnaround prompts
+# Midjourney — 파라미터 정본과 인물 정체성 경로
 
-Use this only when the target is Midjourney v8.1 and the user needs face identity preserved from a reference image.
+타깃 엔진이 Midjourney일 때 이 파일을 먼저 읽는다. 문법·파라미터·레퍼런스 슬롯·무드보드 경로의 정본이다. 캐릭터 시트·턴어라운드의 산문 규칙은 [midjourney-character-sheets.md](midjourney-character-sheets.md)가 갖는다.
 
-## Reference syntax
+표면 판정(기계 계약 / 플랫폼 파라미터 / 붙여넣기 UI)과 거기서 나오는 길이·비율 소관은 [image/surfaces.md](image/surfaces.md)가 정본이다. 이 파일은 **타깃 엔진 층의 제약**만 적는다.
 
-- (2026-07 실측) Midjourney v8.1에서 `--oref` / `--ow`를 사용하지 않는다.
-- 참조 이미지는 일반 image prompt URL로 프롬프트 맨 앞에 둔다: `<reference-url> <text prompt>`.
-- 이미지 영향도 조절이 필요하면 해당 v8.1 런타임 UI에서 실제 지원되는 image-weight 설정을 먼저 확인한다. 확인되지 않은 플래그를 추정해 붙이지 않는다.
-- 얼굴 재현 우선 패스에서는 moodboard·personalization modifier를 생략하고, 기본 이미지 프롬프트가 안정된 뒤 하나씩 추가한다.
+버전·파라미터 사실은 `docs.midjourney.com`(2026-07-25 공식문서 확인) 기준이다. 공식 근거가 없는 것은 **[미확인]**으로 표시했다. 표시된 항목을 단정으로 승격하지 않는다 — 승격하려면 근거부터 붙인다.
 
-## Parameter and account-setting hygiene
+## 1. 버전 기준선
 
-- 최종 파라미터는 ASCII 이중 하이픈 `--`만 허용한다. U+2013 en dash(`–`)와 U+2014 em dash(`—`)는 모양이 비슷해도 파라미터가 아니므로 출력 전 거부·교정한다.
-- 개인 `--profile` ID, private style code, `--preview` 같은 실험 토글은 이미지 레시피가 아니라 계정·현재 UI 설정이다. 사용자가 명시한 값을 임의로 공용 템플릿에 복제하지 말고, active UI에서 존재·지원 여부를 확인한 뒤 해당 실행에만 붙인다.
-- `--raw`, stylize, weird, HD/SD 같은 옵션도 선택 버전의 visible UI와 결과 카드가 정본이다. 서로 다른 버전 가이드의 파라미터를 한 줄에 섞지 않는다.
+- 현행 기본 모델은 **V8.1**. 릴리스 2026-04-14, 기본값 승격 2026-06-10.
+- V8.1 신규 해상도 플래그: `--hd` 2048px(GPU 1.3분) / `--sd` 1024px(0.8분). **HD의 최대 비율은 4:1**, 그 밖은 14:1. HD 결과에 Pan·Zoom·Vary Region을 걸면 SD로 다운스케일된다.
+- V8.1이 지원하지 않는 것: `--q`, `--turbo`, `--niji`, `::` 멀티프롬프트, `--cref`/`--cw`, `--oref`/`--ow`.
 
-## Compact prompt delivery
+레퍼런스 축 호환:
 
-- Midjourney prompts should be materially shorter than the general 2000-character ceiling. For a single portrait, target roughly **400–800 characters** unless the user explicitly requests a dense prompt.
-- Put the user-provided image URL directly at the beginning of the copyable prompt; do not merely mention the link outside it.
-- Preserve only identity geometry, pose, styling, lighting, lens, and mood. Remove explanatory prose, repeated synonyms, and low-impact micro-details.
-- If the user rejects a nationality label, replace it with the requested broad descriptor (for example, `East Asian`) and preserve the intended appearance through directly observable facial geometry rather than nationality-based inference.
-- Return the finished prompt first in one copyable block. Keep notes to one short line or omit them.
+| 축 | V6 | V7 | V8.1 |
+|---|---|---|---|
+| Image Prompt / `--iw` | O | O | O |
+| Style Reference `--sref` · 스타일 코드 · `--sw` | O | O | O |
+| Moodboard·Personalization `--p` | O | O | O |
+| Character Reference `--cref` / `--cw` | O | X | X |
+| Omni Reference `--oref` / `--ow` | X | O | **X — 첨부하면 잡이 V7로 실행된다** |
+| `::` 멀티프롬프트·가중치 | O (6.1까지) | X | X |
+| `--exp` | X | O | O |
 
-## Output layout
+## 2. 인물 정체성 — V8.1에 네이티브 수단이 없다
 
-- **Four full-body turnaround views on one canvas:** use horizontal `--ar 3:2`; explicitly state one horizontal row, generous spacing, and full body from head to feet.
-- **Face reconstruction:** do not make a grid. Generate independent chest-up portraits at `--ar 3:4` with the same reference supplied for every job.
+이것이 이 레인의 가장 중요한 사실이다. 얼굴 동일성을 요구하는 요청이 들어오면 여기서 갈린다.
 
-## Active UI and ten-angle sequence
+- **`--cref`/`--cw`는 V6·Niji6 전용**이다. 현행 파라미터 목록에 등재되어 있지도 않다. 공식 Character Reference 문서 상단이 V7에서는 Omni Reference를 쓰라고 안내한다. `--cw 0`으로 의상 복사를 막는 조언은 V6 시절 문법이며 현행 기본 모델에서 무효다.
+- **`--oref`/`--ow`는 V7 전용**이다. V8.1 프롬프트에 붙이거나 Imagine bar의 Omni 슬롯에 이미지를 넣으면 **잡이 조용히 V7로 실행된다**. 사용자는 V8.1이라고 믿으면서 V7 결과를 받는다. "V8.1에서 `--oref`를 쓰지 않는다"의 이유가 바로 이 무증상 다운시프트다 — 이유를 빼면 다음 사람이 되돌린다.
 
-1. Inspect the Midjourney Web **Create settings** first. The visible model setting and the result-card label are authoritative; do not add a remembered `--v` token merely to force the UI selection.
-2. Verify one minimal front-facing reference job in that same UI/model configuration before any batch. Parameter forms and batch support are runtime-sensitive.
-3. For face fidelity, use ten independent jobs with the same reference and identity core; change **only** the angle clause per job: front, 15°/30°/45° left, left profile, 15°/30°/45° right, right profile, and a near-front high 15° view.
-4. Do not assume permutation/batch syntax will compose with an external identity reference. If a single job is proven but a batch errors, keep the sequence as independent jobs instead of retrying an opaque batch.
-5. A repeat count produces variants of one angle, not a controlled ten-angle set.
+두 갈래 중 하나를 사용자에게 명시하고 고르게 한다.
 
-## Identity delta workflow
+1. **동일 인물이 필요하다 → V7로 내려간다.** `--v 7` + `--oref <URL>` + `--ow`. Omni는 **이미지 1장만** 받는다(인물뿐 아니라 사물·차량·비인간 생물도 대상). 스타일은 `--sref`로 얹고, Personalization·Moodboard·Image Prompt와도 조합된다.
+2. **V8.1을 유지해야 한다 → 인물 고정을 포기한다.** `--sref`/`--p`로 감도만 잡고, 얼굴은 관찰 가능한 지오메트리를 텍스트로 재기술해 근사시킨다. 이 경로는 동일성을 보증하지 않는다.
 
-- 동일 인물 시리즈는 identity core와 프로젝트 style source를 먼저 고정하고, 한 번에 **한 축만** 바꾼다: background → pose → wardrobe → hair/age처럼 단계별로 진행한다. 여러 축을 동시에 바꾸면 어떤 변화가 identity drift를 만들었는지 판정할 수 없다.
-- 각 단계에서 얼굴 윤곽, 눈 간격, 눈썹 각도, 코·입술 외곽, 턱선, 헤어라인을 직전 승인 컷과 비교한다. 드리프트가 생기면 새 금지어를 쌓기보다 마지막 delta를 되돌리고 최소 front-facing job부터 재검증한다.
+`--oref` 비호환 목록(V7 경로를 고른 뒤에도 걸린다): inpainting·outpainting, Vary Region·Pan·Zoom Out, **Fast Mode**, Draft·Conversational Mode, `--q 4`. GPU 비용은 2배다.
+
+레퍼런스와 다른 스타일을 원할 때의 공식 처방: ① `--ow`를 낮춘다 ② 원하는 스타일어를 **프롬프트 앞과 끝 양쪽에** 배치한다 ③ 보존할 신체 특징만 텍스트로 재강화한다. `--ow`는 `--stylize`·`--exp`와 영향력을 두고 경쟁하므로 stylize를 올리면 `--ow`도 함께 올린다.
+
+완벽한 동일성을 보장한다고 쓰지 않는다. `identity fidelity is the highest priority`와 관찰 가능한 앵커를 쓰고, 결과는 확률이 아니라 비교 가능한 얼굴 지오메트리로 판정한다.
+
+## 3. 확정 파라미터
+
+| 파라미터 | 범위 / 기본값 | 비고 |
+|---|---|---|
+| `--ar` | 정수:정수, 최대 14:1 (HD 4:1) / `1:1` | **소수점 불가** — 1.39:1은 `139:100` |
+| `--s` (`--stylize`) | 0–1000 / 100 | 무드보드·퍼스널라이제이션 강도 다이얼 겸용 |
+| `--c` (`--chaos`) | 0–100 / 0 | 한 그리드 4장의 상호 차이. 웹 UI 명칭 "Variety" |
+| `--w` (`--weird`) | 0–3000 / 0 | seed와 완전 호환은 아니다 |
+| `--seed` | 0–4294967295 / random | V8.1은 "99% identical" — 완전 동일이 아니다 |
+| `--iw` | 0–3 (Niji7은 0–2) / 1 | Image Prompt 가중. **V8.1 공식 지원 — 미확인 플래그가 아니다** |
+| `--sw` | 0–1000 / 100 | sref 총량. 이미지보다 **스타일 코드에 더 강하게** 작용. 무드보드와 비호환 |
+| `--ow` | 1–1000 / 100 | V7 전용. 400 이하 권장 |
+| `--exp` | 0–100 / 0 | 권장값 5·10·25·50·100. 25–50을 넘으면 `--stylize`와 `--p`를 압도 |
+| `--cw` | `0`과 `100`이 양 극점 / 100 | V6·Niji6 전용. 0=얼굴 위주, 100=얼굴·머리·**의상**까지. 범위를 명시한 공식 문장은 없다 |
+| `--repeat` (`--r`) | Basic 2–4 / Standard 2–10 / Pro·Mega 2–40 | Fast 전용. **완성 이미지에서 파라미터가 자동 제거**되므로 재실행 시 손으로 다시 붙인다 |
+| `--sv` | **[미확인]** | V7 1–6(기본 6) / V6 1–4(기본 4)만 문서화되어 있고 **V8.1 섹션 자체가 없다.** V8.1 프롬프트에 값을 쓰지 않는다 |
+
+`--exp`의 범위·기본값은 2025-04 V7 릴리스 노트가 출처다. V8.1에서 같은 값인지는 재확인되지 않았고, 지원 여부만 확인됐다. "정수만 받는다"는 서술은 커뮤니티뿐이다 **[미확인]**.
+
+## 4. 표기 규칙
+
+- 파라미터는 **항상 프롬프트 텍스트 뒤**에 온다. 텍스트와 `--` 사이에 공백 1개, `--`와 이름 사이에는 공백을 넣지 않는다. 파라미터 뒤에 텍스트를 다시 붙이지 않는다.
+- 파라미터 구간에 쉼표·마침표를 넣지 않는다. 예외는 `--no`의 값 나열과 permutation `{}` 내부뿐이다.
+- **ASCII 이중 하이픈 `--`만 허용한다.** U+2013 en dash와 U+2014 em dash는 모양이 비슷해도 파라미터가 아니므로 출력 전에 잡아 교정한다.
+- permutation `{a, b, c}`는 파라미터에도 적용된다(`--ar {1:1, 2:3}`). 값 안의 쉼표는 `\,`로 escape. 상한은 플랜별 Basic 4 / Standard 10 / Pro·Mega 40이고 Relax에서는 동작하지 않는다. **Fast·Turbo 전용인데 V8.1은 `--turbo`를 지원하지 않으므로 V8.1 permutation은 사실상 Fast 전용이다.**
+- `--repeat`은 한 각도의 변형을 만들 뿐, 통제된 다각도 세트를 만들지 않는다.
+
+## 5. `--no` — V8.1의 유일한 네거티브 경로
+
+`--no X`는 멀티프롬프트 가중치 `X::-0.5`와 등가지만, `::` 자체가 V7·V8.1에서 죽었다. 따라서 **V8.1에서 네거티브를 표현하는 길은 `--no` 하나뿐**이고, `red::-0.5` 같은 수동 표기를 생성하면 안 된다.
+
+모더레이션이 `--no`에 들어간 **모든 단어를 하나씩 독립적으로 읽는다.** `--no modern clothing`은 "no modern"과 "no clothing"으로 갈려 옷을 지우고 나체 요청으로 오탐될 수 있다.
+
+- 다어절 구를 넣지 않는다. **단일 명사를 쉼표로 나열한다**: `--no fruit, apple, pear`.
+- 자연어 부정문(`without any fruit`, `please don't add fruit`)을 본문에 쓰지 않는다. 원하는 것은 긍정형으로 본문에, 지울 것만 `--no`에 명사로 둔다.
+- `--no`는 인라인 문법이므로 **산출 블록 안에 들어간다.** 네거티브를 따로 복사하게 만들지 않는다.
+
+## 6. 레퍼런스 슬롯 4종 — 복제는 슬롯 선택에서 갈린다
+
+| 슬롯 | 문법 | 가져오는 것 | 가중치 |
+|---|---|---|---|
+| Image Prompt | Discord는 URL을 **프롬프트 맨 앞**에, 여러 장은 공백 구분 | **내용·구도·색** | `--iw` |
+| Style Reference | `--sref <URL 또는 코드>`, 공백 구분 다중, URL+코드 혼용 가능 | **감도만** — 색·매체·질감·조명 | `--sw` |
+| Omni Reference | `--oref <URL>`, **1장만** (V7) | 인물·사물의 **동일성** | `--ow` |
+| Starting Frame | 영상용 | 첫 프레임 | — |
+
+**`--sref`는 정의상 오브젝트와 인물을 복사하지 않는다.** 그러므로 구도·의상이 복사되고 있다면 대개 레퍼런스를 **Image Prompt 슬롯**에 넣은 것이다. 슬롯을 `--sref`로 옮기는 게 1차 처방이고, 이 슬롯 선택이 복제 회피의 핵심이다.
+
+- 이미지만 있고 텍스트가 없는 프롬프트는 `--stylize`·`--weird`와 비호환이다. 이미지 1장 + 텍스트 없음은 성립하지 않는다.
+- 확장자는 `.png` `.gif` `.webp` `.jpg` `.jpeg`.
+- 업로드 이미지에서 sref 코드를 **만들 수 없다.** 코드는 발견하는 것이고, 커스텀 코드는 Style Creator(웹)로만 만든다. Style Creator는 기존 코드가 있는 상태로 진입하면 새 코드를 **추가**할 뿐 병합하지 않는다 — 프리뷰를 재현하려면 두 코드를 모두 쓴다.
+- 2025-06-16 이전에 수집한 sref 코드는 시스템 재작성으로 다른 스타일을 가리킨다. `--sv 4` 폴백 또는 `--v 6`이 대응축이다(공식 파라미터 목록에 `--sv` 자체는 버전 제한 없이 등재돼 있으나 **V8.1의 기본값·유효 범위가 문서화돼 있지 않다** — 이 폴백을 확실히 기댈 수 있는 것은 값이 문서화된 V7·V6 경로다).
+- 누출이 남으면 순서대로: ① 슬롯을 sref로 옮긴다 ② `--sw`를 낮춘다 ③ 텍스트에서 피사체와 의상을 과잉 특정해 레퍼런스 의상이 들어올 자리를 없앤다 ④ 레퍼런스를 클로즈업에서 환경 샷으로 바꾼다(포트레이트가 더 많이 샌다). 구체적인 `--sw` 조절 수치표는 단일 커뮤니티 출처뿐이다 **[미확인]**.
+- 공식 Best Practice는 하나로 요약된다: 텍스트에 "레퍼런스를 어떻게 고쳐라"라고 쓰지 말고 **원하는 피사체를 독립적으로 완결되게** 쓴다. `the look of this image but a dog`이 아니라 `detailed portrait of a dog`.
+
+## 7. 무드보드 경로
+
+무드보드는 **Personalization의 한 종류**이며 **`--p`**(롱폼 `--profile`)로 참조한다. 전용 플래그가 없고, **`--sref`에 넣는 것이 아니다** — 커뮤니티에 "무드보드 코드를 `--sref`에 넣어라"는 오기가 널려 있다. 그 표기를 생성하지 않는다.
+
+- `--p` 단독 → 기본 지정 프로필/보드 / `--p mID` → 특정 무드보드(m 접두) / `--p pID` → 개인화 프로필(p 접두) / `--p code` → 스냅샷 코드. 제출하면 `--p mID`가 자동으로 `--p code`로 치환된다.
+- 복수 나열 가능(`--p code1 code2 code3`)이며 나열된 코드는 동등 가중이다.
+- **`--sw`·`--sv`와 비호환.** `--sw`는 에러도 없이 조용히 무시된다. **강도 축은 `--stylize` 하나뿐**(0–1000, 기본 100).
+- 무드보드를 지워도 이미 생성된 스냅샷 코드는 계속 동작한다. 반면 `mID`는 컬렉션 포인터라서 보드가 사라지면 깨진다. → **프로젝트 룩이 확정되면 `mID`가 아니라 스냅샷 코드를 적어 두고 그걸로 배포한다.**
+- Personalization은 버전마다 별도 Global Profile을 가진다. 언락하지 않고 `--p`를 쓰면 에러가 난다.
+- `--exp`가 25–50을 넘으면 `--stylize`와 `--p`를 압도하므로, 무드보드를 쓰는 잡에서는 `--exp`를 낮게 유지한다.
+- **장수:** 공식 권장도 최댓값도 없다 **[미확인]**. 출처들이 일치하는 법칙은 하나뿐이다 — **적을수록 결과가 좁고 고정적, 많을수록 다양하다.** 구체적인 숫자(5–10장, 8–12장, 최대 100장 등)는 전부 커뮤니티 값이므로 숫자를 제시하지 않고 이 방향성만 전달한다.
+- 무드보드는 수정 가능한 것이 sref 코드 대비 최대 장점이다. 결과가 한쪽으로 쏠리면 프롬프트를 늘리기 전에 보드에서 쏠린 이미지를 빼고 반대쪽을 넣는다.
+
+### `--sref random` + Draft 샘플러
+
+"같은 감도, 다른 결과"를 만드는 실무 경로다.
+
+- `--sref random`은 제출 시 실제 코드로 치환되며, reroll·variation에서는 같은 코드가 유지된다.
+- permutation·`--repeat`·**Draft 모드**와 함께 쓰면 **이미지마다 다른 코드**가 붙는다. Draft 잡은 한 번에 24장·512px·GPU 0.4분(웹 전용)이므로, 한 잡으로 24가지 스타일을 훑고 → 채택분만 풀 해상도로 재렌더 → 코드를 채집 → 그 코드로 통제된 후속 생성으로 넘어간다.
+- 제약: `--sref random`과 sref 코드는 `--sv 4`·`--sv 6`에서만 동작한다. V8.1의 `--sv`가 문서화되어 있지 않으므로 이 제약이 V8.1에서 어떻게 적용되는지는 **[미확인]**이다.
+- **Draft 모드의 V8.1 호환은 공식 문서가 자기모순이다** — 버전 호환표는 V8.1을 미지원(✗)으로 적고, Draft 아티클은 "7 and 8.1" 호환이라 쓰며 V8.1 전용 동작까지 상술한다. 동작할 가능성이 높지만 단정하지 않는다. 실행 전에 해당 UI에서 확인한다.
+- `--preview` — V8.2 미리보기로의 단건 옵트인. **공식 문서에 등재돼 있지 않다.** [출처: 사용자 확인 + 커뮤니티 다수 / 공식 근거 없음] 릴리스 시점·플랫폼 제약·출력 변동성 같은 세부는 출처가 커뮤니티뿐이라 적지 않는다. 쓰기 전에 UI에서 직접 확인한다.
+- 개인 프로필 ID, private style code처럼 사용자 계정에 묶인 값은 사용자가 명시한 실행에만 붙인다. 공용 템플릿에 복제하지 않는다.
+
+## 8. 길이 — 미드저니는 단어 수로 잰다
+
+**문자 수 게이트를 이 엔진에 적용하지 않는다.** 붙여넣기 표면의 블록당 2000자 하드라인은 [image/surfaces.md](image/surfaces.md) 소관이고, Midjourney 프롬프트는 그 한참 아래에서 끝나므로 실효 제약이 아니다.
+
+전달 예산은 **단어 수**다: **40 단어 권장 / 60 경고 / 80 초과 금지.** 이는 신호 밀도를 지키기 위한 MPW의 예산이지 엔진이 거부하는 경계가 아니다 — 공식 문서에 단어 수 상한 서술은 없다 **[미확인]**. 커뮤니티가 말하는 문자 하드 캡 수치도 **[미확인]**이며 게이트로 쓰지 않는다.
+
+- 산출은 **한 블록**이다. 이미지 URL, 텍스트, 파라미터, `--no`가 모두 그 블록 안에 들어가 복사 한 번으로 끝나야 한다. 다중 컷일 때만 컷당 한 블록.
+- 이미지 URL은 블록 **맨 앞**에 둔다. 링크를 블록 밖에서 언급만 하지 않는다.
+- 남기는 것: identity 지오메트리, 포즈, 스타일링, 조명, 렌즈, 무드. 버리는 것: 설명 산문, 반복 동의어, 저영향 미세 디테일.
+- 국적 라벨을 사용자가 거부하면 요청받은 넓은 서술어(예: `East Asian`)로 바꾸고, 의도한 외모는 국적 추론이 아니라 직접 관찰 가능한 얼굴 지오메트리로 유지한다.
+- 무드보드를 쓰는 잡에서는 프롬프트를 더 짧게 간다. 긴 프롬프트가 무드보드 결과를 악화시킨다는 관찰이 반복되며, 아트 스타일 단어는 보드와 충돌하므로 본문에서 뺀다.
+
+## 9. Identity prompt core
+
+얼굴 정체성이 최우선임을 명시하고, 안정적이고 눈에 보이는 특징을 이름으로 부른다: 얼굴 지오메트리, 눈 모양과 간격, 눈썹 각도·밀도, 콧대와 코끝, 입술 외곽, 볼 윤곽, 턱선, 헤어라인, 헤어스타일. 각도 비교용 컷은 chest-up 프레이밍과 중립 표정으로 고정한다.
+
+## 10. Identity delta 워크플로
+
+- 동일 인물 시리즈는 identity core와 프로젝트 style source를 먼저 고정하고 **한 번에 한 축만** 바꾼다: background → pose → wardrobe → hair/age. 여러 축을 동시에 바꾸면 어떤 변화가 드리프트를 만들었는지 판정할 수 없다.
+- 각 단계에서 얼굴 윤곽, 눈 간격, 눈썹 각도, 코·입술 외곽, 턱선, 헤어라인을 직전 승인 컷과 비교한다. 드리프트가 생기면 새 금지어를 쌓지 말고 마지막 delta를 되돌린 뒤 최소 front-facing 잡부터 재검증한다.
 - 다중 캐릭터 프로젝트는 `one character = one reference set`, `one project = one frozen style source`로 관리한다. 캐릭터별 참조와 style source를 같은 슬롯이나 한 장의 군상 레퍼런스로 뭉개지 않는다.
-- 완벽한 동일성을 보장한다고 쓰지 않는다. `identity fidelity is the highest priority`와 관찰 가능한 앵커를 사용하고, 결과는 확률이 아니라 비교 가능한 얼굴 지오메트리로 판정한다.
 
-## Identity prompt core
+## 11. 출력 레이아웃과 각도 시퀀스
 
-State that facial identity is the highest priority and name stable, visible characteristics: face geometry, eye shape and spacing, brow angle/density, nose bridge and tip, lip outline, cheek contour, jawline, hairline, hairstyle. Specify chest-up framing and neutral expression for angle-comparison cuts.
+- **한 캔버스에 전신 4뷰 턴어라운드:** 가로 `--ar 3:2`, 한 줄 배치·넉넉한 간격·머리부터 발끝까지를 명시한다.
+- **얼굴 재구성:** 그리드를 만들지 않는다. `--ar 3:4` chest-up 포트레이트를 독립 잡으로 뽑고 모든 잡에 같은 레퍼런스를 준다.
+- 배치 전에 **UI의 Create settings를 먼저 확인한다.** 눈에 보이는 모델 설정과 결과 카드 라벨이 정본이며, UI 선택을 강제하려고 기억에 의존한 `--v` 토큰을 덧붙이지 않는다. 같은 설정에서 최소 정면 잡 하나를 먼저 검증한 뒤 배치로 넘어간다.
+- 얼굴 충실도 배치는 10개 독립 잡으로 간다. 같은 레퍼런스와 identity core를 두고 **각도 절만** 바꾼다: 정면, 좌 15°/30°/45°, 좌 프로필, 우 15°/30°/45°, 우 프로필, 정면에 가까운 하이앵글 15°. 이 시퀀스는 §2의 V7 경로 위에서만 동일성을 기대할 수 있다.
+- permutation으로 각도를 스윕하려면 §4의 실제 제약(Fast 전용, 플랜별 상한 4/10/40, Relax 불가)을 먼저 확인한다. 단일 잡이 검증됐는데 배치가 에러를 내면 독립 잡 시퀀스를 유지한다.
