@@ -73,6 +73,7 @@
 | 명조/세리프 | `bold serif`, `high-contrast didone`, `elegant thin serif` |
 | 돋움/고딕/산세리프 | `clean geometric sans-serif`, `modern grotesque sans` |
 | 콘덴스드 | `condensed sans-serif, tall narrow letterforms` |
+| 매거진 마스트헤드 | `oversized high-contrast serif, magazine masthead scale` |
 | 캘리그래피/손글씨 | `Korean brush calligraphy`, `casual handwritten script` |
 | 모노스페이스 | `monospace, typewriter character` |
 
@@ -87,6 +88,9 @@
 |---|
 | `headline "설맞이 특가" in bold high-contrast didone serif, black weight, wide letter-spacing, #1E3A5F` |
 | `subhead in light geometric sans-serif, ALL CAPS, tight kerning, #B76E79` |
+| `headline in oversized high-contrast serif, magazine masthead scale, black type on white` |
+
+**매거진 마스트헤드.** 얇은 획과 굵은 획의 큰 대비가 사진 위에 잡지 표지급 권위를 만든다 — 커버·배너·에디토리얼 레이아웃에 쓴다. 정확한 색을 고정해야 하면 `black type on white`를 위 텍스트 색 규칙대로 HEX로 치환한다.
 
 ## 4. 정확 문자열 프로토콜
 

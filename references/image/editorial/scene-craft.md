@@ -10,11 +10,14 @@
 
 | 자세 축 | 정면 응시 | 시선 회피 | 오프카메라 | 의상 판독 포인트 |
 |---|---|---|---|---|
-| 서서 | `standing tall, composed direct gaze`, 발은 어깨너비, 상체 직립 | `downcast gaze`, 턱을 낮춰 코트 라펠 그림자 강조 | `looking off-camera left`, 몸은 정면·시선만 측면 | 코트 길이, 팬츠 브레이크, 숄더 라인 |
+| 서서 | `standing tall, composed direct gaze`, `hands on hips, squared shoulders`, 발은 어깨너비, 상체 직립 | `downcast gaze`, 턱을 낮춰 코트 라펠 그림자 강조 | `looking off-camera left`, 몸은 정면·시선만 측면 | 코트 길이, 팬츠 브레이크, 숄더 라인 |
 | 앉아서 | `seated upright, direct eye contact`, 무릎 각도 정돈 | `eyes lowered to hands`, 손끝은 원단 위 | `three-quarter seated, gaze beyond frame` | 스커트·팬츠 주름, 니트 짜임, 허리선 |
 | 기대서 | `leaning against wall, calm front gaze`, 한쪽 어깨만 벽에 접촉 | `averted gaze`, 벽 그림자가 턱선 아래로 떨어짐 | `profile lean, looking past camera` | 재킷 구조, 소매 길이, 직물 눌림 |
 | 걷는 중 | `mid-step, confident silhouette`, 카메라와 눈맞춤 | `candid stride, eyes to ground line` | `walking past camera, gaze to street` | 코트 플레어, 밑단 움직임, 신발 윤곽 |
 | 회전/제스처 | `subtle contrapposto`, `relaxed neutral hips`, `balanced shoulders` | `hand adjusts cuff, eyes lowered` | `over-the-shoulder, gaze off frame` | 커프스, 칼라, 백 실루엣 |
+| 전환 중 | `in-between motion moment, captured transitional gesture`, 완성된 자세가 아니라 동작이 이어지는 순간이라 스톡 포즈 느낌이 지워진다 | `mid-turn, eyes trailing the movement`, 시선이 동작을 한 박자 늦게 따라간다 | `unfinished turn, gaze leading off frame`, 몸보다 시선이 먼저 프레임 밖으로 나간다 | 밑단 관성, 소매 접힘 변화, 어깨선 비틀림 |
+| 손-동작 접점 | `visible hand contact, object interaction cue`, 손이 실제로 접촉해 직물·손목·시선에 물리적 이유가 생긴다 | `hand adjusts cuff, eyes lowered`(이 축의 구체 사례), 시선이 손끝을 따라 내려간다 | `hands engaged, gaze follows the contact point off frame` | 커프스 눌림, 손목 노출, 직물 장력 |
+| 자연 시선 타깃 | `gaze returns to lens between actions`, 응시는 동작 사이 한 박자로만 쓴다 | `natural gaze target, candid attention shift`, 카메라 대신 행동 대상·다음 움직임을 봐 포즈감이 줄어든다 | `eyeline anchored beyond frame edge`, 프레임 밖 대상이 시선 높이를 정한다 | 목선 각도, 턱선 그림자, 칼라 열림 |
 
 안전 판정문: `seductive arch`, `provocative pose` 대신 `editorial upright pose`, `composed direct gaze`, `confident silhouette`, `subtle contrapposto`를 쓴다.
 ## 9. 소재·질감 어휘 — 빛 반응 기반

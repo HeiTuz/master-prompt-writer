@@ -16,16 +16,19 @@
 | 얕은 심도 | `shallow depth of field, background falls off softly into creamy blur` |
 | 빈티지 보케 | `swirly painterly bokeh, gentle vintage rendering` |
 | 아나모픽 | `wide cinematic frame, horizontal flares, oval highlights` |
+| 가장자리 감쇠 | `sharp central microtexture, soft edge focus falloff`(중심부 미세결은 선명, 프레임 가장자리만 점진적으로 풀림) |
 
 ### 7.2 조명 (방향·질·결과)
 
 | 축 | 결과 토큰 |
 |---|---|
 | 패턴 | Rembrandt(뺨 삼각 하이라이트) / butterfly(코밑 나비 그림자) / split(반쪽광) / clamshell(위아래 부드러운 균등광) |
-| 질 | `soft diffuse wraparound light, gentle gradient shadows` ↔ `hard directional light, crisp sharp-edged shadows` |
+| 질 | `soft diffuse wraparound light, gentle gradient shadows` ↔ `hard directional light, crisp sharp-edged shadows`. 중간 단계 레이킹 = `low-angle soft light, gentle relief shadows`(낮은 측면의 넓은 연질광이 돌출부만 밝히고 홈·굴곡엔 완만한 그림자) |
 | 비율 | `key:fill 1:1`(평탄) / `1:2`(자연) / `1:3`(드라마틱). 결과로 `moderate shadow contrast` 식 병기 |
-| 보조 | `cool rim light separating the edge`, `warm practical glow`, `window light from camera left` |
+| 보조 | `cool rim light separating the edge`, `warm practical glow`, `window light from camera left`, `rectangular catchlight, iris radial texture, aligned with key direction`(눈동자 안 사각 반사가 클로즈업에 실촬영 공간감을 만듦) |
 | 시간광 | golden hour 따뜻한 저각광 / blue hour 차분한 한기 / 정오 톱라이트 |
+| 색온도 분리 | `split color-temperature lighting, warm key on skin, cool background wash`(인물이 앞으로 분리되고 공간 깊이가 생김) / 변주 `cool key on subject, warm tungsten practical background` |
+| 하이키 스튜디오 | `high-key white studio, large negative space, clean editorial margins`(순백 배경과 긴 여백이 인물·의상 실루엣을 선명하게 밀어 올림) |
 
 ### 7.3 색·그레이딩 (HEX·켈빈·룩)
 
@@ -69,6 +72,7 @@
 | 기법 | 결과 묘사 | 영어 토큰 |
 |---|---|---|
 | Overexposure | 하이라이트를 밝게 날려 부드럽고 몽환적 | `soft overexposed highlights, bright airy atmosphere` |
+| Highlight retention | 강한 햇빛에서도 흰 옷의 주름·가장자리를 남겨 싸구려 과노출을 피한다 | `retained white fabric detail, soft sun contrast, clean high-key exposure` |
 | Underexposure | 그림자를 깊게 만들어 무게감 있는 분위기 | `slightly underexposed shadows, deep muted tones, dark cinematic mood` |
 | Diffused light | 빛을 부드럽게 퍼뜨려 피부·경계가 자연스러움 | `soft diffused daylight, light filtered through sheer curtains` |
 | Cross process | 색을 비현실적으로 변형한 실험적 필름 무드 | `cross-processed film colors, cyan color shift, unusual color palette` |
@@ -93,18 +97,26 @@
 |---|---|
 | 분할 | rule of thirds, golden ratio, centered iconic |
 | 여백 | 카피용 여백 확보, 매거진 여백, Ma(여백의 호흡) |
-| 유도 | leading lines, 시선 궤적, 삼각 안정 |
+| 유도 | leading lines, 시선 궤적, 삼각 안정, 소품 위계 = `subordinate prop contrast, context props below hero`(소품을 히어로보다 낮은 대비로 두어 맥락은 주되 주 피사체를 가리지 않음) |
 | 샷 사이즈 | ECU(극클로즈업) → CU → MS(미디엄) → FS(전신) → EWS(원경) |
 | 앵글 | eye-level / low(우러름) / high(내려봄) / over-the-shoulder / dutch(기울임) |
 | 거리 | 카메라-피사체 거리를 m로 명시 |
+| 커버 크롭 | `upper-body fashion close-up, tilted head crop, clean cover portrait`(얼굴·주얼리·의상 일부만 크게 잘라 뷰티와 패션 정보를 동시에 압축) |
+| 커버 크롭 변주 | `gesture beauty crop`(손·주얼리가 얼굴 일부를 가림) / `asymmetric cover crop`(대각 축으로 밀어 비대칭) |
+| 풀블리드 매크로 | `full-frame surface macro, no container, texture as subject`(용기·배경을 지우고 표면 자체를 화면 가득 채워 질감이 주제가 됨) |
 
 ### 7.6 재질·후처리 (결과)
 
 | 축 | 결과 토큰 |
 |---|---|
-| 표면 반응 | `matte buttery surface`, `wet specular highlights`, `translucent subsurface glow` |
+| 표면 반응 | `matte buttery surface`, `wet specular highlights`, `translucent subsurface glow`, `thick applied paste, built-up edges, metallic sheen`(두꺼운 도포면·뭉친 가장자리), `fine aerated pores, matte whipped density`(미세 기공·저광택), `textured limestone surface, mineral pitting, chalky matte`(균열·구멍 있는 흰 석회암 면), `crochet and raffia texture, hand-made resort craft detail`(수공예 질감) |
 | 마감 | `subtle film grain`, `gentle vignette`, `halation around bright edges`, `clean unbranded finish` |
 | 피부 | `natural skin texture, visible pores, subtle film grain`, fine facial texture, soft tonal variation, fine vellus hair |
+| 피부 — 촉촉 | `hydrated skin base, moisture-rich finish, dewy but natural skin` |
+| 피부 — 유리알 투명 | `translucent skin clarity, visible texture, non-plastic glow`(반투명하되 모공은 유지) |
+| 피부 — 꿀광 | `inner honey glow, warm luminous skin, subtle cheek highlight` |
+| 피부 — 부분 매트 | `matte T-zone, controlled forehead shine, balanced dewy finish` |
+| 피부 실패조건 짝 | `skin undertone preserved under split lighting` — §7.2 색온도 분리 조명에서 피부톤이 죽지 않게 병기 |
 | 로고·워터마크 의도 | `clean, brand-free, copy-free finish` |
 
 ### 7.7 장르 즉시조합
@@ -114,7 +126,8 @@
 | 패션 에디토리얼 | soft diffuse key + neutral palette + shallow DoF + magazine margins |
 | 네온 누아르 | practical neon glow, teal&orange, wet reflective street, low-angle dutch |
 | 스트리트 다큐 | available light, slightly desaturated, candid framing, deep focus |
-| 제품 히어로 | clean softbox gradient, single hero spotlight, cool rim, HEX 배경 |
+| 제품 히어로 | clean softbox gradient, single hero spotlight, cool rim, HEX 배경 / 변주 gravity-balanced stacking, implied instability(아슬아슬한 균형 구성) |
+| 제품 플랫레이 | clean top-down flatlay + even soft light + generous margins + single hero with subordinate props |
 | 한국 웹툰 | soft cel shading, glossy K-beauty finish, dewy highlights, vertical scroll |
 
 ### 7.8 국문/영문 혼용 규칙
